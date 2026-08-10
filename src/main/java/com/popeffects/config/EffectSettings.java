@@ -62,6 +62,13 @@ public final class EffectSettings {
 	/** Additiv mischen - leuchtet staerker, sieht nach Neon aus. */
 	public boolean additive = true;
 
+	/**
+	 * Zeichnet hinter der Form zusaetzlich einen breiten, blassen Schein.
+	 * Kostet einen zweiten Durchgang, sieht dafuer nach Neonroehre aus statt
+	 * nach aufgeklebtem Band.
+	 */
+	public boolean glow = true;
+
 	/** Auch durch Waende sichtbar. */
 	public boolean throughWalls = false;
 
@@ -75,6 +82,16 @@ public final class EffectSettings {
 
 	/** So viele Ticks am Ende wird ausgeblendet. 0 = harter Schnitt. */
 	public int fadeOutTicks = 12;
+
+	/**
+	 * Wie viele Bloecke der Effekt waehrend des Ausblendens noch zusaetzlich
+	 * nach aussen laeuft.
+	 *
+	 * <p>Genau das laesst ihn sich aufloesen statt einfach stehenzubleiben und
+	 * zu verschwinden: er wird gleichzeitig groesser, duenner und blasser.
+	 * 0 schaltet die Nachdehnung ab.
+	 */
+	public float fadeOutExpansion = 1.2F;
 
 	// --- Groesse -----------------------------------------------------------
 
@@ -247,6 +264,7 @@ public final class EffectSettings {
 		durationTicks = clamp(durationTicks, 3, 200);
 		fadeInTicks = clamp(fadeInTicks, 0, durationTicks);
 		fadeOutTicks = clamp(fadeOutTicks, 0, durationTicks);
+		fadeOutExpansion = clamp(fadeOutExpansion, 0.0F, 8.0F);
 
 		// Zusammen duerfen beide nicht laenger als der Effekt selbst sein,
 		// sonst waere er nie voll sichtbar. Das Ausblenden hat Vorrang, weil
@@ -295,10 +313,12 @@ public final class EffectSettings {
 		copy.rainbow = rainbow;
 		copy.alpha = alpha;
 		copy.additive = additive;
+		copy.glow = glow;
 		copy.throughWalls = throughWalls;
 		copy.durationTicks = durationTicks;
 		copy.fadeInTicks = fadeInTicks;
 		copy.fadeOutTicks = fadeOutTicks;
+		copy.fadeOutExpansion = fadeOutExpansion;
 		copy.startRadius = startRadius;
 		copy.endRadius = endRadius;
 		copy.height = height;

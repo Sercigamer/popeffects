@@ -23,9 +23,9 @@
 | Ausblenden einstellen | `/pe totem fadeout 20` |
 | Alle Befehle | `/pe help` |
 
-## Die acht Stile
+## Die neun Stile
 
-`ring` · `shockwave` · `disc` · `dome` · `sphere` · `pillar` · `helix` · `burst`
+`ring` · `shockwave` · `disc` · `dome` · `sphere` · `pillar` · `helix` · `burst` · `crown`
 
 Jeder Effekt hat seine eigenen Farben, Größen, Dauer, Sounds und Partikel — die vier Auslöser können also völlig unterschiedlich aussehen.
 

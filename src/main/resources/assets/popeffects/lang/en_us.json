@@ -29,6 +29,7 @@
 	"popeffects.style.pillar": "Pillar",
 	"popeffects.style.helix": "Helix",
 	"popeffects.style.burst": "Burst",
+	"popeffects.style.crown": "Crown",
 
 	"popeffects.edit.tab.shape": "Shape",
 	"popeffects.edit.tab.color": "Colour",
@@ -39,7 +40,8 @@
 	"popeffects.edit.duration": "Duration: %s ticks",
 	"popeffects.edit.fade_in": "Fade in: %s ticks",
 	"popeffects.edit.fade_out": "Fade out: %s ticks",
-	"popeffects.edit.fade_hint": "20 ticks = 1 second · fade in and out together at most as long as the duration",
+	"popeffects.edit.fade_expansion": "Drift out: %s blocks",
+	"popeffects.edit.fade_hint": "Drift keeps the effect travelling outwards while it fades away",
 	"popeffects.edit.start_radius": "Start radius: %s",
 	"popeffects.edit.end_radius": "End radius: %s",
 	"popeffects.edit.thickness": "Thickness: %s",
@@ -60,6 +62,7 @@
 	"popeffects.edit.gradient": "Gradient",
 	"popeffects.edit.rainbow": "Rainbow",
 	"popeffects.edit.additive": "Glow",
+	"popeffects.edit.glow": "Halo",
 	"popeffects.edit.through_walls": "Through walls",
 
 	"popeffects.edit.enabled": "Effect",

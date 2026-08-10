@@ -176,8 +176,12 @@ public class EffectEditScreen extends Screen {
 				.build(rightX, row(3), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.additive"),
 						(button, value) -> settings.additive = value));
 
+		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.glow)
+				.build(rightX, row(4), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.glow"),
+						(button, value) -> settings.glow = value));
+
 		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.throughWalls)
-				.build(rightX, row(4), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.through_walls"),
+				.build(rightX, row(5), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.through_walls"),
 						(button, value) -> settings.throughWalls = value));
 	}
 
@@ -197,6 +201,9 @@ public class EffectEditScreen extends Screen {
 
 		addDrawableChild(new IntSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.fade_out", 0, 60,
 				settings.fadeOutTicks, value -> settings.fadeOutTicks = value));
+
+		addDrawableChild(new FloatSliderWidget(leftX, row(4), COLUMN_WIDTH, 20, "popeffects.edit.fade_expansion", 0.0F,
+				6.0F, 0.1F, settings.fadeOutExpansion, value -> settings.fadeOutExpansion = value));
 
 		// Schwelle und Groessenkopplung ergeben nur bei Schaden einen Sinn -
 		// ein Totem poppt nun mal ohne Schadenswert.
@@ -258,19 +265,22 @@ public class EffectEditScreen extends Screen {
 		}
 	}
 
-	/** Zwei Farbfelder mit Hex-Code, damit man die Regler nicht raten muss. */
+	/**
+	 * Zwei Farbfelder mit Hex-Code, damit man die Regler nicht raten muss.
+	 * Sitzt unter den Spalten, damit rechts Platz fuer einen Schalter mehr
+	 * bleibt.
+	 */
 	private void drawColorPreview(DrawContext context) {
 		int centerX = this.width / 2;
-		int rightX = centerX + 5;
-		int y = row(5);
+		int y = this.height - 76;
 
-		context.fill(rightX, y, rightX + 70, y + 20, 0xFF000000 | settings.colorStartRgb());
-		context.fill(rightX + 80, y, rightX + COLUMN_WIDTH, y + 20, 0xFF000000 | settings.colorEndRgb());
+		context.fill(centerX - 105, y, centerX - 5, y + 16, 0xFF000000 | settings.colorStartRgb());
+		context.fill(centerX + 5, y, centerX + 105, y + 16, 0xFF000000 | settings.colorEndRgb());
 
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorStart), rightX + 35,
-				y + 6, 0xFFFFFFFF);
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorEnd), rightX + 115,
-				y + 6, 0xFFFFFFFF);
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorStart), centerX - 55,
+				y + 4, 0xFFFFFFFF);
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorEnd), centerX + 55,
+				y + 4, 0xFFFFFFFF);
 	}
 
 	private static int row(int index) {

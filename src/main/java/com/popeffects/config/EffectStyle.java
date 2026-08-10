@@ -27,7 +27,10 @@ public enum EffectStyle {
 	HELIX("popeffects.style.helix"),
 
 	/** Strahlen, die sternfoermig nach aussen schiessen. */
-	BURST("popeffects.style.burst");
+	BURST("popeffects.style.burst"),
+
+	/** Ein Kranz aus stehenden Zacken, der nach aussen laeuft. */
+	CROWN("popeffects.style.crown");
 
 	private final String translationKey;
 
@@ -46,6 +49,6 @@ public enum EffectStyle {
 
 	/** Nur diese Stile brauchen eine Hoehe - der Editor blendet sie sonst aus. */
 	public boolean usesHeight() {
-		return this == DOME || this == SPHERE || this == PILLAR || this == HELIX;
+		return this == DOME || this == SPHERE || this == PILLAR || this == HELIX || this == CROWN;
 	}
 }

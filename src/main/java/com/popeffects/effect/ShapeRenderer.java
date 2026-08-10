@@ -132,6 +132,35 @@ public final class ShapeRenderer {
 		}
 	}
 
+	/**
+	 * Kranz aus stehenden Zacken. Jede Zacke ist ein Trapez, unten breit und
+	 * oben schmal - das laesst sie wie eine Flamme wirken, kostet aber nur ein
+	 * einziges Viereck.
+	 */
+	public static void crown(VertexConsumer consumer, Matrix4f matrix, float y, float radius, float height,
+			int spikes, float width, float rotation, int bottomColor, int topColor) {
+		float half = width * 0.5F;
+
+		for (int i = 0; i < spikes; i++) {
+			float angle = rotation + (TAU * i) / spikes;
+
+			float dirX = cos(angle);
+			float dirZ = sin(angle);
+			float baseX = dirX * radius;
+			float baseZ = dirZ * radius;
+
+			// Senkrecht zur Blickrichtung nach aussen - so steht die Zacke
+			// quer zum Radius und ist von aussen gut zu sehen.
+			float perpX = -dirZ * half;
+			float perpZ = dirX * half;
+
+			consumer.vertex(matrix, baseX + perpX, y, baseZ + perpZ).color(bottomColor);
+			consumer.vertex(matrix, baseX + perpX * 0.15F, y + height, baseZ + perpZ * 0.15F).color(topColor);
+			consumer.vertex(matrix, baseX - perpX * 0.15F, y + height, baseZ - perpZ * 0.15F).color(topColor);
+			consumer.vertex(matrix, baseX - perpX, y, baseZ - perpZ).color(bottomColor);
+		}
+	}
+
 	private static float cos(float angle) {
 		return (float) Math.cos(angle);
 	}

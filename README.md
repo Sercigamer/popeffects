@@ -23,7 +23,7 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 - [Installation](#installation)
 - [Erste Schritte](#erste-schritte)
 - [Die vier Auslöser](#die-vier-auslöser)
-- [Die acht Stile](#die-acht-stile)
+- [Die neun Stile](#die-neun-stile)
 - [Alle Einstellungen](#alle-einstellungen)
 - [Tastenbelegung](#tastenbelegung)
 - [Befehle](#befehle)
@@ -42,7 +42,7 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 1. [Fabric Loader](https://fabricmc.net/use/installer/) für **1.21.11** installieren.
 2. [Fabric API](https://modrinth.com/mod/fabric-api) für 1.21.11 in den
    `mods`-Ordner legen. **Ohne sie startet die Mod nicht.**
-3. `popeffects-1.0.0.jar` daneben legen.
+3. `popeffects-1.2.0.jar` daneben legen.
 4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) — dann gibt es im
    Mod-Menü einen Zahnrad-Knopf zu PopEffects.
 
@@ -57,7 +57,7 @@ der Mod — die hier also, keine Forge-Version.
 1. Lunar-Client-Launcher öffnen.
 2. Links die Version **1.21.11** auswählen.
 3. Unten rechts auf *Einstellungen*, oben den Reiter **Mods** wählen.
-4. `popeffects-1.0.0.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
+4. `popeffects-1.2.0.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
    Über den 📁-Knopf kommst du direkt in den Ordner, falls du lieber kopierst.
 5. Lunar Client neu starten.
 
@@ -101,7 +101,7 @@ Schadens-Effekte ausschließlich bei Gegnern, die *du* getroffen hast.
 
 ---
 
-## Die acht Stile
+## Die neun Stile
 
 | Stil | Aussehen |
 | --- | --- |
@@ -113,14 +113,15 @@ Schadens-Effekte ausschließlich bei Gegnern, die *du* getroffen hast.
 | `pillar` | Senkrechter Zylinder um das Ziel |
 | `helix` | Spirale, die nach oben läuft |
 | `burst` | Strahlen, die sternförmig nach außen schießen |
+| `crown` | Ein Kranz aus stehenden Zacken, der nach außen läuft |
 
 Ringe werden mit weichen Kanten gezeichnet: innen und außen läuft die Farbe
-auf null aus. Das kostet kaum etwas und sieht deutlich besser aus als eine
-harte Kante.
+auf null aus. Dazu kommt auf Wunsch ein breiter, blasser **Schein** hinter der
+Form — das ist der Unterschied zwischen aufgeklebtem Band und Neonröhre.
 
-| `ring` | `burst` | `helix` |
+| `ring` | `burst` | `crown` |
 | --- | --- | --- |
-| ![Ring](docs/stil-ring.png) | ![Strahlen](docs/stil-burst.png) | ![Spirale](docs/stil-helix.png) |
+| ![Ring](docs/stil-ring.png) | ![Strahlen](docs/stil-burst.png) | ![Zackenkranz](docs/stil-crown.png) |
 
 ---
 
@@ -132,7 +133,7 @@ Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 
 | Einstellung | Bedeutung |
 | --- | --- |
-| Stil | Eine der acht Formen |
+| Stil | Eine der neun Formen |
 | Startradius / Endradius | Der Effekt wächst von einem zum anderen |
 | Dicke | Breite der Bänder in Blöcken |
 | Höhe | Für Kuppel, Kugel, Säule und Spirale |
@@ -151,6 +152,7 @@ Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 | Regenbogen | Ignoriert beide Farben und dreht den Farbkreis durch |
 | Deckkraft | 10 bis 255 |
 | Leuchten | Additives Mischen — kräftiger, sieht nach Neon aus |
+| Schein | Breiter, blasser Halo hinter der Form — weicher Rand statt harter Kante |
 | Durch Wände | Der Effekt bleibt auch hinter Blöcken sichtbar |
 
 ### Reiter „Ablauf"
@@ -161,6 +163,7 @@ Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 | Dauer | Lebensdauer in Ticks (20 Ticks = 1 Sekunde) |
 | Einblenden | So viele Ticks am Anfang wird aufgeblendet. 0 = sofort voll da |
 | Ausblenden | So viele Ticks am Ende wird ausgeblendet. 0 = harter Schnitt |
+| Nachdehnen | Wie viele Blöcke der Effekt beim Verblassen noch nach außen läuft |
 | Schwelle | Ab wie viel Schaden ausgelöst wird (nur bei den Schadens-Effekten) |
 | Größe je Schaden | Ein harter Treffer erzeugt einen größeren Effekt, bis zum Dreifachen |
 
@@ -168,12 +171,17 @@ Ein- und Ausblenden zählen in **Ticks, nicht in Prozent**. Stellst du die Dauer
 länger, bleibt das Ausblenden also genau so lang wie vorher — der Effekt steht
 dann einfach länger, bevor er weggeht.
 
+**Nachdehnen** ist das, was den Abgang sauber macht: der Effekt läuft während
+des Verblassens weiter nach außen und wird dabei dünner. Er löst sich also auf,
+statt auf den letzten Prozent stehenzubleiben und dann einfach weg zu sein.
+
 | kurz nach dem Pop | kurz vor Schluss |
 | --- | --- |
 | ![Effekt kurz nach dem Auslösen](docs/fade-fruh.png) | ![Derselbe Effekt beim Ausblenden](docs/fade-spaet.png) |
 
-Links die Schockwelle kurz nach dem Auslösen, rechts derselbe Effekt vier Ticks
-vor Schluss: größer geworden, zur Endfarbe gewandert und sichtbar blasser.
+Derselbe Ring, einmal sechs und einmal zwanzig Ticks nach dem Auslösen: deutlich
+weiter außen, dünner, zur Endfarbe gewandert — und immer noch in Bewegung, als
+er verschwindet.
 
 ### Reiter „Ton"
 
@@ -313,7 +321,7 @@ Shader-Dateien mit, die bei einem Minecraft-Update kaputtgehen könnten.
 
 Zum Prüfen der Grafik gibt es einen Selbsttest. Startest du mit
 `-Dpopeffects.selftest=true`, spielt die Mod nach dem Betreten einer Welt
-einmal jeden der acht Stile ab und legt von jedem einen Screenshot in
+einmal jeden der neun Stile ab und legt von jedem zwei Screenshots in
 `screenshots/` — praktisch nach einem Minecraft-Update.
 
 ---

@@ -26,6 +26,15 @@ import net.minecraft.util.math.Vec3d;
  * selbst auch, sonst wird es weit weg vom Weltursprung ungenau.
  */
 public final class EffectRenderer {
+	/** Wie viel breiter der Schein hinter der Form ist. */
+	private static final float GLOW_WIDTH = 3.2F;
+
+	/** Wie blass der Schein gegenueber der Form selbst ist. */
+	private static final float GLOW_ALPHA = 0.3F;
+
+	/** Um so viel duenner wird das Band bis zum Ende des Ausblendens. */
+	private static final float DISSOLVE_THINNING = 0.55F;
+
 	private EffectRenderer() {
 	}
 
@@ -85,13 +94,40 @@ public final class EffectRenderer {
 		float rotation = (float) Math.toRadians(effect.rotationOffset + settings.rotationSpeed * seconds);
 
 		int baseColor = baseColor(effect, progress, seconds);
-		int color = ColorMath.scaleAlpha(baseColor, fade(settings, ageTicks));
-		int transparent = ColorMath.scaleAlpha(baseColor, 0.0F);
 
-		float radius = radiusAt(settings, progress) * effect.scale;
+		// Erst der breite, blasse Schein, dann die Form selbst darueber - so
+		// bekommt der Effekt einen weichen Rand statt einer harten Kante.
+		if (settings.glow) {
+			emit(consumer, matrix, effect, ageTicks, progress, baseColor, rotation, GLOW_WIDTH, GLOW_ALPHA);
+		}
+
+		emit(consumer, matrix, effect, ageTicks, progress, baseColor, rotation, 1.0F, 1.0F);
+	}
+
+	/**
+	 * Zeichnet die Form einmal komplett.
+	 *
+	 * @param thicknessScale Breite gegenueber der Einstellung - der Schein
+	 *                       benutzt hier einen groesseren Wert.
+	 * @param alphaScale     Deckkraft gegenueber der Einstellung.
+	 */
+	private static void emit(VertexConsumer consumer, Matrix4f matrix, ActiveEffect effect, float ageTicks,
+			float progress, int baseColor, float rotation, float thicknessScale, float alphaScale) {
+		EffectSettings settings = effect.settings;
+
+		float dissolve = dissolve(settings, ageTicks);
+		float radius = radiusAt(settings, progress, dissolve) * effect.scale;
 		float height = settings.height * ease(progress) * effect.scale;
-		float half = settings.thickness * 0.5F;
 		float y = settings.yOffset;
+
+		// Beim Ausblenden wird das Band duenner. Zusammen mit dem
+		// Weiterlaufen nach aussen loest sich der Effekt dadurch auf, statt
+		// stehenzubleiben und dann einfach weg zu sein.
+		float thickness = settings.thickness * thicknessScale * (1.0F - DISSOLVE_THINNING * dissolve);
+		float half = thickness * 0.5F;
+
+		int color = ColorMath.scaleAlpha(baseColor, fade(settings, ageTicks) * alphaScale);
+		int transparent = ColorMath.scaleAlpha(baseColor, 0.0F);
 
 		switch (settings.style) {
 			case RING -> softRing(consumer, matrix, y, radius, half, settings.segments, rotation, color, transparent);
@@ -107,14 +143,17 @@ public final class EffectRenderer {
 						continue;
 					}
 
-					float ringRadius = radiusAt(settings, ringProgress) * effect.scale;
+					// Jeder Ring rechnet auf seiner eigenen Uhr - so blendet
+					// auch jeder fuer sich aus und dehnt sich dabei nach.
+					float ringAge = ringProgress * settings.durationTicks;
+					float ringDissolve = dissolve(settings, ringAge);
+					float ringRadius = radiusAt(settings, ringProgress, ringDissolve) * effect.scale;
+					float ringHalf = settings.thickness * thicknessScale
+							* (1.0F - DISSOLVE_THINNING * ringDissolve) * 0.5F;
 
-					// Jeder Ring blendet nach denselben Zeiten aus wie ein
-					// einzelner Effekt - gerechnet auf seiner eigenen Uhr.
-					int ringColor = ColorMath.scaleAlpha(baseColor,
-							fade(settings, ringProgress * settings.durationTicks));
+					int ringColor = ColorMath.scaleAlpha(baseColor, fade(settings, ringAge) * alphaScale);
 
-					softRing(consumer, matrix, y, ringRadius, half, settings.segments, rotation, ringColor,
+					softRing(consumer, matrix, y, ringRadius, ringHalf, settings.segments, rotation, ringColor,
 							transparent);
 				}
 			}
@@ -154,13 +193,20 @@ public final class EffectRenderer {
 				softRing(consumer, matrix, y + 0.02F, radius, half, settings.segments, rotation, color, transparent);
 			}
 
-			case HELIX -> ShapeRenderer.helix(consumer, matrix, y, radius, height, settings.ringCount,
-					settings.thickness, settings.segments, rotation, color, ColorMath.scaleAlpha(baseColor, 0.15F));
+			case HELIX -> ShapeRenderer.helix(consumer, matrix, y, radius, height, settings.ringCount, thickness,
+					settings.segments, rotation, color, ColorMath.scaleAlpha(baseColor, 0.15F * alphaScale));
 
 			case BURST -> {
 				int rayCount = MathHelper.clamp(settings.segments / 4, 4, 24);
-				ShapeRenderer.rays(consumer, matrix, y, radius * 0.15F, radius, rayCount, settings.thickness * 2.0F,
-						rotation, color, transparent);
+				ShapeRenderer.rays(consumer, matrix, y, radius * 0.15F, radius, rayCount, thickness * 2.0F, rotation,
+						color, transparent);
+			}
+
+			case CROWN -> {
+				int spikes = MathHelper.clamp(settings.segments / 6, 5, 16);
+				ShapeRenderer.crown(consumer, matrix, y, radius, height, spikes, thickness * 3.0F, rotation, color,
+						transparent);
+				softRing(consumer, matrix, y, radius, half, settings.segments, rotation, color, transparent);
 			}
 		}
 	}
@@ -176,16 +222,43 @@ public final class EffectRenderer {
 		ShapeRenderer.annulus(consumer, matrix, y, radius, radius + half, segments, rotation, color, transparent);
 	}
 
-	private static float radiusAt(EffectSettings settings, float progress) {
-		return MathHelper.lerp(ease(progress), settings.startRadius, settings.endRadius);
+	/**
+	 * Radius zum Zeitpunkt {@code progress}, inklusive der Nachdehnung
+	 * waehrend des Ausblendens.
+	 */
+	private static float radiusAt(EffectSettings settings, float progress, float dissolve) {
+		float base = MathHelper.lerp(ease(progress), settings.startRadius, settings.endRadius);
+		return base + settings.fadeOutExpansion * dissolve;
 	}
 
 	/**
-	 * Schnell raus, dann auslaufen - ohne das wirkt jede Explosion traege.
+	 * Kurve fuer das Wachsen: erst schnell nach aussen, dann ruhiger.
+	 *
+	 * <p>Bewusst eine Potenz kleiner als 1: die laeuft am Ende noch weiter,
+	 * statt auf den letzten Prozent stehenzubleiben. Ein Effekt, der erst
+	 * einfriert und dann verschwindet, sieht nach Abbruch aus - einer, der
+	 * beim Verblassen noch nach aussen zieht, loest sich auf.
 	 */
 	private static float ease(float progress) {
-		float inverse = 1.0F - MathHelper.clamp(progress, 0.0F, 1.0F);
-		return 1.0F - inverse * inverse * inverse;
+		return (float) Math.pow(MathHelper.clamp(progress, 0.0F, 1.0F), 0.6D);
+	}
+
+	/**
+	 * Wie weit der Effekt in der Ausblendphase steckt: 0 davor, 1 ganz am
+	 * Ende. Steuert Nachdehnung und Ausduennen.
+	 */
+	private static float dissolve(EffectSettings settings, float ageTicks) {
+		if (settings.fadeOutTicks <= 0) {
+			return 0.0F;
+		}
+
+		float remaining = settings.durationTicks - ageTicks;
+
+		if (remaining >= settings.fadeOutTicks) {
+			return 0.0F;
+		}
+
+		return smooth(MathHelper.clamp(1.0F - remaining / settings.fadeOutTicks, 0.0F, 1.0F));
 	}
 
 	/**
@@ -209,10 +282,12 @@ public final class EffectRenderer {
 			factor = Math.min(factor, remaining / settings.fadeOutTicks);
 		}
 
-		factor = MathHelper.clamp(factor, 0.0F, 1.0F);
+		return smooth(MathHelper.clamp(factor, 0.0F, 1.0F));
+	}
 
-		// Weich statt linear - linear wirkt am Ende abgehackt.
-		return factor * factor * (3.0F - 2.0F * factor);
+	/** Weiches Ein- und Auslaufen - linear wirkt an den Enden abgehackt. */
+	private static float smooth(float value) {
+		return value * value * (3.0F - 2.0F * value);
 	}
 
 	private static int baseColor(ActiveEffect effect, float progress, float seconds) {

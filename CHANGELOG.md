@@ -4,6 +4,24 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.2.0] - 2026-08-10
+
+### Geändert
+
+- **Der Abgang sieht jetzt aus wie ein Abgang.** Bisher benutzte der Radius
+  eine Ease-out-Kurve, die schon bei 80 Prozent der Lebenszeit auf 99 Prozent
+  der Endgröße war — der Ring stand also still und verschwand dann einfach.
+  Jetzt läuft er bis zuletzt weiter nach außen.
+- Neu dazu: **Nachdehnen**. Während des Ausblendens legt der Effekt noch
+  einstellbar viele Blöcke Radius drauf und wird dabei dünner. Er löst sich
+  auf, statt abgeschnitten zu werden.
+
+### Neu
+
+- **Schein**: ein breiter, blasser Halo hinter jeder Form. Macht aus dem
+  aufgeklebten Band eine Neonröhre. Pro Effekt abschaltbar.
+- **Neuer Stil `crown`**: ein Kranz aus stehenden Zacken, der nach außen läuft.
+
 ## [1.1.0] - 2026-08-10
 
 ### Neu
@@ -60,5 +78,6 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[1.2.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.0.0

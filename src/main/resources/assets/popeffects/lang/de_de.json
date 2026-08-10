@@ -29,6 +29,7 @@
 	"popeffects.style.pillar": "Säule",
 	"popeffects.style.helix": "Spirale",
 	"popeffects.style.burst": "Strahlen",
+	"popeffects.style.crown": "Zackenkranz",
 
 	"popeffects.edit.tab.shape": "Form",
 	"popeffects.edit.tab.color": "Farbe",
@@ -39,7 +40,8 @@
 	"popeffects.edit.duration": "Dauer: %s Ticks",
 	"popeffects.edit.fade_in": "Einblenden: %s Ticks",
 	"popeffects.edit.fade_out": "Ausblenden: %s Ticks",
-	"popeffects.edit.fade_hint": "20 Ticks = 1 Sekunde · Ein- und Ausblenden zusammen höchstens so lang wie die Dauer",
+	"popeffects.edit.fade_expansion": "Nachdehnen: %s Blöcke",
+	"popeffects.edit.fade_hint": "Nachdehnen lässt den Effekt beim Verblassen weiter nach außen laufen",
 	"popeffects.edit.start_radius": "Startradius: %s",
 	"popeffects.edit.end_radius": "Endradius: %s",
 	"popeffects.edit.thickness": "Dicke: %s",
@@ -60,6 +62,7 @@
 	"popeffects.edit.gradient": "Farbverlauf",
 	"popeffects.edit.rainbow": "Regenbogen",
 	"popeffects.edit.additive": "Leuchten",
+	"popeffects.edit.glow": "Schein",
 	"popeffects.edit.through_walls": "Durch Wände",
 
 	"popeffects.edit.enabled": "Effekt",
