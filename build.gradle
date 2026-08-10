@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -14,35 +14,6 @@ base {
 
 repositories {
 	// Loom fuegt die Minecraft-/Fabric-Repositories selbst hinzu.
-	maven {
-		name = 'TerraformersMC'
-		url = uri('https://maven.terraformersmc.com/releases/')
-	}
-}
-
-// Die Mod laeuft auf mehreren Minecraft-Versionen. Der allergroesste Teil des
-// Codes ist fuer alle gleich; nur eine Handvoll Klassen muss je Version anders
-// aussehen, weil Mojang die API umgebaut hat. Die liegen unter src/mc<version>
-// und tragen ueberall denselben Klassennamen - hier wird der passende Ordner
-// dazugelegt.
-def versionSourceDir = 'src/mc' + project.minecraft_version.replace('.', '_') + '/java'
-
-if (!file(versionSourceDir).isDirectory()) {
-	throw new GradleException("Kein Quellordner fuer Minecraft ${project.minecraft_version}: ${versionSourceDir}")
-}
-
-sourceSets {
-	main {
-		java {
-			srcDir versionSourceDir
-		}
-
-		// Die Mixin-Liste gehoert dazu: nicht jede Version hat dieselben
-		// Einhaengepunkte.
-		resources {
-			srcDir 'src/mc' + project.minecraft_version.replace('.', '_') + '/resources'
-		}
-	}
 }
 
 loom {
@@ -54,9 +25,9 @@ loom {
 			// dem Grund.
 			runDir 'run-' + project.minecraft_version
 
-			// Selbsttest und Direktstart in eine Welt, beides nur auf Zuruf:
+			// Selbsttests, beide nur auf Zuruf:
 			//   ./gradlew runClient -Pselftest -Pworld="New World"
-			// Ohne die Schalter startet der Client ganz normal.
+			//   ./gradlew runClient -Ptriggertest -Pworld="New World"
 			if (project.hasProperty('selftest')) {
 				property 'popeffects.selftest', 'true'
 			}
@@ -74,14 +45,13 @@ loom {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// Mod Menu ist optional: nur zum Kompilieren und im Dev-Client vorhanden,
-	// wird nicht mitgeliefert und nicht vorausgesetzt.
-	modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+	// Kein mappings-Eintrag und kein modImplementation: Minecraft 26.x wird
+	// unobfuskiert ausgeliefert. Die Klassen im Jar heissen bereits
+	// Minecraft, LivingEntity und GuiGraphics, es gibt also nichts
+	// umzubenennen - weder beim Bauen noch bei den Abhaengigkeiten.
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
@@ -104,14 +74,12 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	// Minecraft 26.x setzt Java 25 voraus.
+	it.options.release = 25
 	it.options.encoding = 'UTF-8'
 }
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
 
 	withSourcesJar()
 }
