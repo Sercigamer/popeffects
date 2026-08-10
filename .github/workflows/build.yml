@@ -27,7 +27,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        run: ./gradlew build --stacktrace
+        # Das chmod ist Absicht: wird gradlew aus Windows heraus neu
+        # hinzugefuegt, fehlt im Git-Index das Ausfuehrbar-Bit und der Runner
+        # bricht mit "Permission denied" ab, bevor Gradle ueberhaupt startet.
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build --stacktrace
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
