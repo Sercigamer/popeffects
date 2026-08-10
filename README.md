@@ -42,7 +42,7 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 1. [Fabric Loader](https://fabricmc.net/use/installer/) für **1.21.11** installieren.
 2. [Fabric API](https://modrinth.com/mod/fabric-api) für 1.21.11 in den
    `mods`-Ordner legen. **Ohne sie startet die Mod nicht.**
-3. `popeffects-1.3.0.jar` daneben legen.
+3. `popeffects-1.3.1.jar` daneben legen.
 4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) — dann gibt es im
    Mod-Menü einen Zahnrad-Knopf zu PopEffects.
 
@@ -57,7 +57,7 @@ der Mod — die hier also, keine Forge-Version.
 1. Lunar-Client-Launcher öffnen.
 2. Links die Version **1.21.11** auswählen.
 3. Unten rechts auf *Einstellungen*, oben den Reiter **Mods** wählen.
-4. `popeffects-1.3.0.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
+4. `popeffects-1.3.1.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
    Über den 📁-Knopf kommst du direkt in den Ordner, falls du lieber kopierst.
 5. Lunar Client neu starten.
 

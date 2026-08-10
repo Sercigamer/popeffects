@@ -4,6 +4,25 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.3.1] - 2026-08-11
+
+### Behoben
+
+- **Der Schadens-Effekt hat nie ausgelöst.** Der Einhängepunkt zum Messen des
+  Lebensverlusts saß auf `Entity.onDataTrackerUpdate` — die Methode wird zwar
+  aufgerufen, aber erst, wenn alle neuen Werte schon geschrieben sind. Der
+  „vorher"-Wert war also bereits der „nachher"-Wert und die Differenz immer
+  null. Jetzt wird der zuletzt gesehene Lebensstand in `onTrackedDataSet`
+  mitgeführt. Betrifft alle Versionen bis einschließlich 1.3.0.
+
+### Neu
+
+- **Auslöser-Selbsttest** mit `-Dpopeffects.triggertest=true`: setzt im
+  Einzelspieler über den eingebauten Server echte Befehle ab — Totem in die
+  Hand, tödlicher Schaden, Zombie herbeirufen, verletzen, töten — und prüft
+  danach, ob der passende Effekt entstanden ist. Genau dieser Test hat den
+  Fehler oben gefunden.
+
 ## [1.3.0] - 2026-08-10
 
 ### Geändert
@@ -98,6 +117,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[1.3.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.1.0

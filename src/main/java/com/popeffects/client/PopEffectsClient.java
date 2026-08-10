@@ -30,6 +30,7 @@ public final class PopEffectsClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(EffectManager::tick);
 
 		SelfTest.registerIfRequested();
+		TriggerSelfTest.registerIfRequested();
 
 		HudElementRegistry.attachElementAfter(VanillaHudElements.STATUS_EFFECTS, PopEffects.id("pop_counter"),
 				new PopCounterHud());

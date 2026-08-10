@@ -28,6 +28,10 @@ loom {
 				property 'popeffects.selftest', 'true'
 			}
 
+			if (project.hasProperty('triggertest')) {
+				property 'popeffects.triggertest', 'true'
+			}
+
 			if (project.hasProperty('world')) {
 				programArgs '--quickPlaySingleplayer', project.property('world').toString()
 			}
