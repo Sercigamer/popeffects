@@ -1,6 +1,7 @@
 package com.popeffects.client;
 
 import com.popeffects.PopEffects;
+import com.popeffects.compat.CommandCompat;
 import com.popeffects.config.TriggerType;
 import com.popeffects.effect.ActiveEffect;
 import com.popeffects.effect.EffectManager;
@@ -193,7 +194,7 @@ public final class TriggerSelfTest {
 					.withEntity(player)
 					.withPosition(new Vec3d(player.getX(), player.getY(), player.getZ()));
 
-			server.getCommandManager().parseAndExecute(source, command);
+			CommandCompat.run(server, source, command);
 		});
 	}
 }

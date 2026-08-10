@@ -40,3 +40,6 @@ gradle-local.properties
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Loom-Laufordner je Minecraft-Version
+run-*/

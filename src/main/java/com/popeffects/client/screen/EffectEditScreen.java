@@ -3,6 +3,8 @@ package com.popeffects.client.screen;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.popeffects.compat.EffectLayers;
+import com.popeffects.compat.WidgetCompat;
 import com.popeffects.config.ConfigManager;
 import com.popeffects.config.EffectSettings;
 import com.popeffects.config.EffectStyle;
@@ -98,8 +100,8 @@ public class EffectEditScreen extends Screen {
 		int leftX = centerX - COLUMN_WIDTH - 5;
 		int rightX = centerX + 5;
 
-		addDrawableChild(CyclingButtonWidget
-				.builder((EffectStyle style) -> Text.translatable(style.translationKey()), settings.style)
+		addDrawableChild(WidgetCompat
+				.cycler((EffectStyle style) -> Text.translatable(style.translationKey()), settings.style)
 				.values(EffectStyle.values())
 				.build(leftX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.style"),
 						(button, value) -> settings.style = value));
@@ -172,17 +174,24 @@ public class EffectEditScreen extends Screen {
 				.build(rightX, row(2), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.rainbow"),
 						(button, value) -> settings.rainbow = value));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.additive)
+		// Beide Schalter brauchen eigene Render-Pipelines. Wo Minecraft die
+		// nicht hergibt, wird der Knopf ausgegraut statt wirkungslos
+		// angeboten - lieber ehrlich als still.
+		CyclingButtonWidget<Boolean> additiveButton = CyclingButtonWidget.onOffBuilder(settings.additive)
 				.build(rightX, row(3), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.additive"),
-						(button, value) -> settings.additive = value));
+						(button, value) -> settings.additive = value);
+		additiveButton.active = EffectLayers.supportsAdditive();
+		addDrawableChild(additiveButton);
 
 		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.glow)
 				.build(rightX, row(4), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.glow"),
 						(button, value) -> settings.glow = value));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.throughWalls)
+		CyclingButtonWidget<Boolean> throughWallsButton = CyclingButtonWidget.onOffBuilder(settings.throughWalls)
 				.build(rightX, row(5), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.through_walls"),
-						(button, value) -> settings.throughWalls = value));
+						(button, value) -> settings.throughWalls = value);
+		throughWallsButton.active = EffectLayers.supportsThroughWalls();
+		addDrawableChild(throughWallsButton);
 	}
 
 	private void initFlowTab(int centerX) {
@@ -225,8 +234,8 @@ public class EffectEditScreen extends Screen {
 				.build(leftX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound"),
 						(button, value) -> settings.sound = value));
 
-		addDrawableChild(CyclingButtonWidget
-				.builder((String id) -> Text.literal(shortName(id)), settings.soundId)
+		addDrawableChild(WidgetCompat
+				.cycler((String id) -> Text.literal(shortName(id)), settings.soundId)
 				.values(withCurrent(EffectSettings.SOUND_PRESETS, settings.soundId))
 				.build(leftX, row(1), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound_id"),
 						(button, value) -> settings.soundId = value));
@@ -241,8 +250,8 @@ public class EffectEditScreen extends Screen {
 				.build(rightX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.particles"),
 						(button, value) -> settings.particles = value));
 
-		addDrawableChild(CyclingButtonWidget
-				.builder((String id) -> Text.literal(shortName(id)), settings.particleId)
+		addDrawableChild(WidgetCompat
+				.cycler((String id) -> Text.literal(shortName(id)), settings.particleId)
 				.values(withCurrent(EffectSettings.PARTICLE_PRESETS, settings.particleId))
 				.build(rightX, row(1), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.particle_id"),
 						(button, value) -> settings.particleId = value));

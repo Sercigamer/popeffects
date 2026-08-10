@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
+import com.popeffects.compat.EffectLayers;
+import com.popeffects.compat.RenderFrame;
+import com.popeffects.compat.WorldRenderHook;
 import com.popeffects.config.ConfigManager;
 import com.popeffects.config.EffectSettings;
 
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -39,10 +40,10 @@ public final class EffectRenderer {
 	}
 
 	public static void register() {
-		WorldRenderEvents.AFTER_ENTITIES.register(EffectRenderer::render);
+		WorldRenderHook.register(EffectRenderer::render);
 	}
 
-	private static void render(WorldRenderContext context) {
+	private static void render(RenderFrame frame) {
 		List<ActiveEffect> effects = EffectManager.active();
 
 		if (effects.isEmpty()) {
@@ -51,18 +52,14 @@ public final class EffectRenderer {
 
 		MinecraftClient client = MinecraftClient.getInstance();
 		ClientWorld world = client.world;
-		MatrixStack matrices = context.matrices();
-		VertexConsumerProvider consumers = context.consumers();
 
-		if (world == null || matrices == null || consumers == null) {
+		if (world == null) {
 			return;
 		}
 
-		Vec3d camera = context.worldState().cameraRenderState.pos;
-
-		if (camera == null) {
-			return;
-		}
+		MatrixStack matrices = frame.matrices();
+		VertexConsumerProvider consumers = frame.consumers();
+		Vec3d camera = frame.cameraPos();
 
 		float tickDelta = client.getRenderTickCounter().getTickProgress(false);
 		double maxDistance = ConfigManager.get().maxDistance;
@@ -85,7 +82,7 @@ public final class EffectRenderer {
 
 	private static void draw(ActiveEffect effect, Matrix4f matrix, VertexConsumerProvider consumers, float tickDelta) {
 		EffectSettings settings = effect.settings;
-		VertexConsumer consumer = consumers.getBuffer(PopRenderLayers.forEffect(settings.additive,
+		VertexConsumer consumer = consumers.getBuffer(EffectLayers.forEffect(settings.additive,
 				settings.throughWalls));
 
 		float ageTicks = effect.age() + tickDelta;

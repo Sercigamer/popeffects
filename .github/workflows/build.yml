@@ -13,6 +13,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Ein Jar je Minecraft-Version. Die Zeilen hier sind die einzige Stelle,
+    # an der neue Versionen eingetragen werden muessen - der Rest des Builds
+    # nimmt sie als Gradle-Parameter entgegen.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - minecraft: "1.21.10"
+            yarn: "1.21.10+build.3"
+            fabric_api: "0.138.4+1.21.10"
+          - minecraft: "1.21.11"
+            yarn: "1.21.11+build.6"
+            fabric_api: "0.141.6+1.21.11"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,17 +40,20 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
+      - name: Build fuer Minecraft ${{ matrix.minecraft }}
         # Das chmod ist Absicht: wird gradlew aus Windows heraus neu
         # hinzugefuegt, fehlt im Git-Index das Ausfuehrbar-Bit und der Runner
         # bricht mit "Permission denied" ab, bevor Gradle ueberhaupt startet.
         run: |
           chmod +x ./gradlew
-          ./gradlew build --stacktrace
+          ./gradlew build --stacktrace \
+            -Pminecraft_version=${{ matrix.minecraft }} \
+            -Pyarn_mappings=${{ matrix.yarn }} \
+            -Pfabric_version=${{ matrix.fabric_api }}
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
         with:
-          name: popeffects-dev-build
+          name: popeffects-dev-build-${{ matrix.minecraft }}
           path: build/libs/*.jar
           if-no-files-found: error

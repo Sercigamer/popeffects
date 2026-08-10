@@ -4,6 +4,34 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.4.0] - 2026-08-11
+
+### Neu
+
+- **Läuft jetzt auch auf Minecraft 1.21.10.** Es gibt ab sofort ein Jar je
+  Version, die Version steht im Dateinamen: `popeffects-1.4.0+1.21.11.jar`
+  und `popeffects-1.4.0+1.21.10.jar`.
+- Auf 1.21.10 fehlen **Leuchten** und **Durch Wände**: die Bausteine, aus
+  denen sich in 1.21.11 eigene Render-Pipelines bauen lassen, sind dort alle
+  paketprivat. Statt sie über eine Kette von Zugriffs-Hacks zu erzwingen,
+  nutzt die Mod dort den passenden Vanilla-Layer. Die beiden Schalter sind im
+  Menü ausgegraut statt wirkungslos — der Rest ist identisch, und beide
+  Optionen sind ohnehin standardmäßig aus.
+- Die versionsabhängigen Stellen stecken in einer schmalen Schicht unter
+  `src/mc<version>`; der restliche Code ist für alle Versionen derselbe.
+- Der Entwicklungs-Client benutzt pro Minecraft-Version einen eigenen
+  Laufordner. Sonst versucht ein älterer Client, eine mit einer neueren
+  Version erstellte Welt zu öffnen — das verweigert Minecraft wortkarg.
+
+### Nicht dabei
+
+- **1.21.9** ist bewusst außen vor: Fabric API hatte in dieser Version gar
+  keine World-Render-Events (die Klassen fehlen dort komplett und kamen erst
+  mit 1.21.10 zurück). Dafür wäre ein eigener `WorldRenderer`-Mixin nötig.
+- **26.1 / 26.2** brauchen eine eigene Codebasis: für 26.x gibt es keine
+  Yarn-Mappings mehr, Fabric ist dort auf Mojang-Namen umgestiegen. Damit
+  heißt praktisch jede Minecraft-Klasse anders.
+
 ## [1.3.1] - 2026-08-11
 
 ### Behoben
@@ -117,6 +145,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[1.4.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.2.0

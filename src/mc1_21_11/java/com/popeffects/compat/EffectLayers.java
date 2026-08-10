@@ -1,4 +1,4 @@
-package com.popeffects.effect;
+package com.popeffects.compat;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -8,28 +8,27 @@ import com.popeffects.mixin.RenderLayerInvoker;
 
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.RenderSetup;
 
 /**
  * Vier eigene Render-Layer: einmal normal und einmal additiv (leuchtend), das
  * Ganze je einmal mit und ohne Tiefentest.
  *
- * <p>Vanilla hat fuer sowas nichts Passendes: {@link RenderLayers#debugQuads()}
- * kann kein additives Mischen, {@link RenderLayers#dragonRays()} zeichnet
- * Dreiecke statt Vierecke, und "durch Waende" kann keiner von beiden.
+ * <p>Fassung fuer Minecraft 1.21.11. Dort werden Layer aus einem
+ * {@link RenderSetup} gebaut - in 1.21.9 und 1.21.10 sah das noch anders aus,
+ * deshalb liegt diese Klasse in einem versionseigenen Quellordner.
  *
  * <p>Alle vier bauen auf dem Vanilla-Shader {@code core/position_color} auf -
  * es kommen also keine eigenen Shader-Dateien dazu, die bei einem
  * Minecraft-Update kaputtgehen koennten.
  */
-public final class PopRenderLayers {
+public final class EffectLayers {
 	private static final RenderLayer SOLID = create("popeffects_solid", false, false);
 	private static final RenderLayer SOLID_THROUGH_WALLS = create("popeffects_solid_xray", false, true);
 	private static final RenderLayer GLOW = create("popeffects_glow", true, false);
 	private static final RenderLayer GLOW_THROUGH_WALLS = create("popeffects_glow_xray", true, true);
 
-	private PopRenderLayers() {
+	private EffectLayers() {
 	}
 
 	/**
@@ -38,6 +37,15 @@ public final class PopRenderLayers {
 	 * Initialisierer dieser Klasse.
 	 */
 	public static void init() {
+	}
+
+	/** Ab 1.21.11 lassen sich eigene Pipelines bauen - beides geht also. */
+	public static boolean supportsAdditive() {
+		return true;
+	}
+
+	public static boolean supportsThroughWalls() {
+		return true;
 	}
 
 	public static RenderLayer forEffect(boolean additive, boolean throughWalls) {

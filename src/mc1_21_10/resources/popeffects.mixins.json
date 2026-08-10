@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "com.popeffects.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ClientPlayNetworkHandlerMixin",
+		"LivingEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

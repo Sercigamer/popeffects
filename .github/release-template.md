@@ -1,16 +1,27 @@
-> Clientseitige Fabric-Mod für Minecraft {{MC_VERSION}}.
+> Clientseitige Fabric-Mod für Minecraft **1.21.10** und **1.21.11**.
 > Effekt-Kreise um Gegner, die ein Totem poppen, viel Schaden fressen oder sterben.
 
 {{CHANGELOG}}
 
+## Welches Jar?
+
+Für jede Minecraft-Version gibt es ein eigenes Jar — die Version steht im Dateinamen:
+
+| Minecraft | Datei |
+| --- | --- |
+| 1.21.11 | `popeffects-{{VERSION}}+1.21.11.jar` |
+| 1.21.10 | `popeffects-{{VERSION}}+1.21.10.jar` |
+
+Auf 1.21.10 fehlen zwei optionale Sachen, weil Minecraft dort die nötigen Render-Bausteine noch nicht herausgibt: **Leuchten** (additives Mischen) und **Durch Wände**. Beide sind ohnehin standardmäßig aus; im Menü sind die Schalter dort ausgegraut. Alles andere ist identisch.
+
 ## Installation
 
-1. [Fabric Loader](https://fabricmc.net/use/installer/) für **{{MC_VERSION}}** installieren
-2. [Fabric API](https://modrinth.com/mod/fabric-api) für {{MC_VERSION}} in den `mods`-Ordner legen — **zwingend nötig**
-3. `{{JAR}}` daneben legen
+1. [Fabric Loader](https://fabricmc.net/use/installer/) für deine Version installieren
+2. [Fabric API](https://modrinth.com/mod/fabric-api) in den `mods`-Ordner legen — **zwingend nötig**
+3. Das passende Jar von oben daneben legen
 4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) für den Zahnrad-Knopf im Mod-Menü
 
-**Lunar Client:** Launcher öffnen → links die Version **{{MC_VERSION}}** wählen → unten rechts auf *Einstellungen* → Reiter *Mods* → beide Jars ins Fenster ziehen. Danach Lunar neu starten.
+**Lunar Client:** Launcher öffnen → links die Version wählen → unten rechts auf *Einstellungen* → Reiter *Mods* → beide Jars ins Fenster ziehen. Danach Lunar neu starten.
 
 ## Erste Schritte
 

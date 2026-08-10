@@ -3,7 +3,9 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.mod_version
+// Die Minecraft-Version gehoert in den Dateinamen: pro Version gibt es ein
+// eigenes Jar, und niemand soll raten muessen, welches er braucht.
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -18,9 +20,40 @@ repositories {
 	}
 }
 
+// Die Mod laeuft auf mehreren Minecraft-Versionen. Der allergroesste Teil des
+// Codes ist fuer alle gleich; nur eine Handvoll Klassen muss je Version anders
+// aussehen, weil Mojang die API umgebaut hat. Die liegen unter src/mc<version>
+// und tragen ueberall denselben Klassennamen - hier wird der passende Ordner
+// dazugelegt.
+def versionSourceDir = 'src/mc' + project.minecraft_version.replace('.', '_') + '/java'
+
+if (!file(versionSourceDir).isDirectory()) {
+	throw new GradleException("Kein Quellordner fuer Minecraft ${project.minecraft_version}: ${versionSourceDir}")
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir versionSourceDir
+		}
+
+		// Die Mixin-Liste gehoert dazu: nicht jede Version hat dieselben
+		// Einhaengepunkte.
+		resources {
+			srcDir 'src/mc' + project.minecraft_version.replace('.', '_') + '/resources'
+		}
+	}
+}
+
 loom {
 	runs {
 		client {
+			// Eigener Ordner je Minecraft-Version. Sonst versucht ein
+			// aelterer Client, eine mit einer neueren Version erstellte Welt
+			// zu oeffnen - das verweigert Minecraft, und man sucht lange nach
+			// dem Grund.
+			runDir 'run-' + project.minecraft_version
+
 			// Selbsttest und Direktstart in eine Welt, beides nur auf Zuruf:
 			//   ./gradlew runClient -Pselftest -Pworld="New World"
 			// Ohne die Schalter startet der Client ganz normal.
