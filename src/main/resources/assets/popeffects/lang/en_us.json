@@ -32,10 +32,14 @@
 
 	"popeffects.edit.tab.shape": "Shape",
 	"popeffects.edit.tab.color": "Colour",
-	"popeffects.edit.tab.extra": "Extras",
+	"popeffects.edit.tab.flow": "Timing",
+	"popeffects.edit.tab.sound": "Sound",
 
 	"popeffects.edit.style": "Style",
 	"popeffects.edit.duration": "Duration: %s ticks",
+	"popeffects.edit.fade_in": "Fade in: %s ticks",
+	"popeffects.edit.fade_out": "Fade out: %s ticks",
+	"popeffects.edit.fade_hint": "20 ticks = 1 second · fade in and out together at most as long as the duration",
 	"popeffects.edit.start_radius": "Start radius: %s",
 	"popeffects.edit.end_radius": "End radius: %s",
 	"popeffects.edit.thickness": "Thickness: %s",
@@ -97,6 +101,7 @@
 	"popeffects.help.preview": "/pe <effect> preview — play the effect in front of you",
 	"popeffects.help.style": "/pe <effect> style <style> — pick a shape",
 	"popeffects.help.color": "/pe <effect> color start #FF5555 · color end #FFAA00 — set the colours",
+	"popeffects.help.fade": "/pe <effect> fadein <ticks> · fadeout <ticks> — fade in and out",
 	"popeffects.help.threshold": "/pe <effect> threshold <damage> — when it fires",
 	"popeffects.help.reset": "/pe reset — back to defaults",
 	"popeffects.help.keys": "Press P to open the menu (Options → Controls → Miscellaneous)"

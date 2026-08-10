@@ -1,13 +1,16 @@
 package com.popeffects.config;
 
+import java.util.Locale;
+
 /**
  * Alles, was einen einzelnen Effekt ausmacht. Jeder {@link TriggerType} hat
  * eine eigene Instanz davon, deshalb kann ein Totem-Pop komplett anders
  * aussehen als ein Kill.
  *
- * <p>Die Felder sind absichtlich oeffentlich und einfach gehalten: so bleibt
- * die JSON-Datei lesbar und man kann sie auch von Hand bearbeiten oder mit
- * Freunden tauschen.
+ * <p>Die Felder sind nach Themen sortiert - erst was, dann welche Farbe, dann
+ * wie lange, dann wie gross, zuletzt Ton und Partikel. In derselben
+ * Reihenfolge landen sie auch in der JSON-Datei, damit man sie dort von Hand
+ * bearbeiten oder mit Freunden tauschen kann.
  */
 public final class EffectSettings {
 	/** Vorschlaege fuer den Sound-Knopf im Menue. Eigene IDs gehen trotzdem. */
@@ -34,14 +37,18 @@ public final class EffectSettings {
 			"minecraft:glow"
 	};
 
+	// --- Was ---------------------------------------------------------------
+
 	public boolean enabled = true;
 	public EffectStyle style = EffectStyle.RING;
 
-	/** Farbe am Anfang des Effekts, als 0xRRGGBB. */
-	public int colorStart = 0xFF5555;
+	// --- Farbe -------------------------------------------------------------
+
+	/** Farbe am Anfang, als {@code #RRGGBB}. */
+	public String colorStart = "#FF5555";
 
 	/** Farbe am Ende. Wird nur benutzt, wenn {@link #gradient} an ist. */
-	public int colorEnd = 0xFFAA00;
+	public String colorEnd = "#FFAA00";
 
 	/** Ueber die Lebensdauer von {@link #colorStart} nach {@link #colorEnd} blenden. */
 	public boolean gradient = true;
@@ -49,7 +56,7 @@ public final class EffectSettings {
 	/** Ignoriert beide Farben und dreht stattdessen den Farbkreis durch. */
 	public boolean rainbow = false;
 
-	/** Deckkraft 0-255. */
+	/** Deckkraft 0-255, bevor das Ein- und Ausblenden daraufkommt. */
 	public int alpha = 200;
 
 	/** Additiv mischen - leuchtet staerker, sieht nach Neon aus. */
@@ -58,8 +65,18 @@ public final class EffectSettings {
 	/** Auch durch Waende sichtbar. */
 	public boolean throughWalls = false;
 
+	// --- Zeit --------------------------------------------------------------
+
 	/** Lebensdauer in Ticks (20 Ticks = 1 Sekunde). */
-	public int durationTicks = 20;
+	public int durationTicks = 24;
+
+	/** So viele Ticks am Anfang wird eingeblendet. 0 = sofort voll da. */
+	public int fadeInTicks = 2;
+
+	/** So viele Ticks am Ende wird ausgeblendet. 0 = harter Schnitt. */
+	public int fadeOutTicks = 12;
+
+	// --- Groesse -----------------------------------------------------------
 
 	/** Radius am Anfang und am Ende, in Bloecken. */
 	public float startRadius = 0.4F;
@@ -71,13 +88,13 @@ public final class EffectSettings {
 	/** Verschiebung nach oben, gemessen ab den Fuessen. */
 	public float yOffset = 0.05F;
 
-	/** Dicke der Linien bzw. Baender in Bloecken. */
+	/** Dicke der Baender in Bloecken. */
 	public float thickness = 0.18F;
 
 	/** Ecken pro Ring. Mehr = runder, aber auch mehr Dreiecke. */
 	public int segments = 48;
 
-	/** Anzahl Ringe bei Schockwelle, Kuppel und Kugel. */
+	/** Anzahl Ringe bei Schockwelle, Kuppel und Kugel; Windungen bei der Spirale. */
 	public int ringCount = 3;
 
 	/** Drehung in Grad pro Sekunde. 0 = steht still. */
@@ -86,11 +103,15 @@ public final class EffectSettings {
 	/** Effekt haengt am Ziel statt an der Stelle, wo er ausgeloest wurde. */
 	public boolean followEntity = true;
 
+	// --- Ausloesen ---------------------------------------------------------
+
+	/** Ab wie viel Schaden ausgeloest wird. Nur bei den Schadens-Effekten. */
+	public float threshold = 6.0F;
+
 	/** Radius waechst mit dem Schaden - nur bei Schadens-Triggern sinnvoll. */
 	public boolean scaleWithDamage = true;
 
-	/** Ab wie viel Schaden (in halben Herzen) ausgeloest wird. */
-	public float threshold = 6.0F;
+	// --- Ton und Partikel --------------------------------------------------
 
 	public boolean sound = true;
 	public String soundId = "minecraft:block.beacon.activate";
@@ -111,10 +132,12 @@ public final class EffectSettings {
 		switch (type) {
 			case TOTEM_POP -> {
 				settings.style = EffectStyle.SHOCKWAVE;
-				settings.colorStart = 0xFFD54A;
-				settings.colorEnd = 0x37D67A;
+				settings.colorStart = "#FFD54A";
+				settings.colorEnd = "#37D67A";
 				settings.endRadius = 3.4F;
-				settings.durationTicks = 26;
+				settings.durationTicks = 28;
+				settings.fadeInTicks = 2;
+				settings.fadeOutTicks = 18;
 				settings.ringCount = 3;
 				settings.soundId = "minecraft:block.beacon.activate";
 				settings.soundPitch = 1.4F;
@@ -122,21 +145,25 @@ public final class EffectSettings {
 			}
 			case BIG_DAMAGE -> {
 				settings.style = EffectStyle.RING;
-				settings.colorStart = 0xFF3B3B;
-				settings.colorEnd = 0xFF9F1C;
+				settings.colorStart = "#FF3B3B";
+				settings.colorEnd = "#FF9F1C";
 				settings.endRadius = 2.6F;
-				settings.durationTicks = 16;
+				settings.durationTicks = 18;
+				settings.fadeInTicks = 1;
+				settings.fadeOutTicks = 12;
 				settings.threshold = 6.0F;
 				settings.sound = false;
 				settings.soundId = "minecraft:block.note_block.pling";
 			}
 			case KILL -> {
 				settings.style = EffectStyle.DOME;
-				settings.colorStart = 0xB05CFF;
-				settings.colorEnd = 0x2E1A66;
+				settings.colorStart = "#B05CFF";
+				settings.colorEnd = "#2E1A66";
 				settings.endRadius = 2.2F;
 				settings.height = 2.6F;
-				settings.durationTicks = 30;
+				settings.durationTicks = 32;
+				settings.fadeInTicks = 3;
+				settings.fadeOutTicks = 20;
 				settings.ringCount = 5;
 				settings.followEntity = false;
 				settings.scaleWithDamage = false;
@@ -147,17 +174,58 @@ public final class EffectSettings {
 			case SELF_HURT -> {
 				settings.enabled = false;
 				settings.style = EffectStyle.PILLAR;
-				settings.colorStart = 0xFF2D55;
-				settings.colorEnd = 0x7A0025;
+				settings.colorStart = "#FF2D55";
+				settings.colorEnd = "#7A0025";
 				settings.endRadius = 1.4F;
 				settings.height = 2.0F;
-				settings.durationTicks = 14;
+				settings.durationTicks = 16;
+				settings.fadeInTicks = 1;
+				settings.fadeOutTicks = 10;
 				settings.threshold = 6.0F;
 				settings.sound = false;
 			}
 		}
 
 		return settings;
+	}
+
+	public int colorStartRgb() {
+		return parseColor(colorStart, 0xFF5555);
+	}
+
+	public int colorEndRgb() {
+		return parseColor(colorEnd, 0xFFAA00);
+	}
+
+	public void setColorStartRgb(int rgb) {
+		colorStart = formatColor(rgb);
+	}
+
+	public void setColorEndRgb(int rgb) {
+		colorEnd = formatColor(rgb);
+	}
+
+	/** {@code "#FF5555"} wird zu {@code 0xFF5555}. */
+	public static int parseColor(String hex, int fallback) {
+		if (hex == null) {
+			return fallback;
+		}
+
+		String cleaned = hex.trim();
+
+		if (cleaned.startsWith("#")) {
+			cleaned = cleaned.substring(1);
+		}
+
+		try {
+			return Integer.parseInt(cleaned, 16) & 0xFFFFFF;
+		} catch (NumberFormatException e) {
+			return fallback;
+		}
+	}
+
+	public static String formatColor(int rgb) {
+		return String.format(Locale.ROOT, "#%06X", rgb & 0xFFFFFF);
 	}
 
 	/**
@@ -170,10 +238,23 @@ public final class EffectSettings {
 			style = EffectStyle.RING;
 		}
 
-		colorStart &= 0xFFFFFF;
-		colorEnd &= 0xFFFFFF;
+		// Schreibt nebenbei krumme Schreibweisen wie "ff5555" oder "#FF5555 "
+		// in die einheitliche Form zurueck.
+		colorStart = formatColor(colorStartRgb());
+		colorEnd = formatColor(colorEndRgb());
+
 		alpha = clamp(alpha, 10, 255);
 		durationTicks = clamp(durationTicks, 3, 200);
+		fadeInTicks = clamp(fadeInTicks, 0, durationTicks);
+		fadeOutTicks = clamp(fadeOutTicks, 0, durationTicks);
+
+		// Zusammen duerfen beide nicht laenger als der Effekt selbst sein,
+		// sonst waere er nie voll sichtbar. Das Ausblenden hat Vorrang, weil
+		// genau darum der Effekt gebaut ist.
+		if (fadeInTicks + fadeOutTicks > durationTicks) {
+			fadeInTicks = durationTicks - fadeOutTicks;
+		}
+
 		startRadius = clamp(startRadius, 0.0F, 32.0F);
 		endRadius = clamp(endRadius, 0.2F, 32.0F);
 		height = clamp(height, 0.2F, 16.0F);
@@ -216,6 +297,8 @@ public final class EffectSettings {
 		copy.additive = additive;
 		copy.throughWalls = throughWalls;
 		copy.durationTicks = durationTicks;
+		copy.fadeInTicks = fadeInTicks;
+		copy.fadeOutTicks = fadeOutTicks;
 		copy.startRadius = startRadius;
 		copy.endRadius = endRadius;
 		copy.height = height;
@@ -225,8 +308,8 @@ public final class EffectSettings {
 		copy.ringCount = ringCount;
 		copy.rotationSpeed = rotationSpeed;
 		copy.followEntity = followEntity;
-		copy.scaleWithDamage = scaleWithDamage;
 		copy.threshold = threshold;
+		copy.scaleWithDamage = scaleWithDamage;
 		copy.sound = sound;
 		copy.soundId = soundId;
 		copy.soundVolume = soundVolume;

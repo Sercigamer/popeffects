@@ -56,9 +56,48 @@ public final class ConfigManager {
 			}
 		}
 
-		config.configVersion = PopEffectsConfig.CURRENT_VERSION;
+		migrate();
 		config.sanitize();
 		save();
+	}
+
+	/**
+	 * Zieht aeltere Config-Dateien nach.
+	 *
+	 * <p>Version 2: Farben standen vorher als Dezimalzahl in der Datei
+	 * ({@code 16733525}), jetzt als {@code "#FF5555"}. Beim Einlesen einer
+	 * alten Datei landet die Zahl als Ziffernfolge im Textfeld - die muessen
+	 * wir als Dezimalzahl deuten, sonst wuerde sie faelschlich als Hex
+	 * gelesen und die Farbe waere hinterher eine andere.
+	 */
+	private static void migrate() {
+		if (config.configVersion < 2) {
+			for (TriggerType type : TriggerType.values()) {
+				EffectSettings settings = config.get(type);
+
+				if (settings != null) {
+					settings.colorStart = decimalToHex(settings.colorStart);
+					settings.colorEnd = decimalToHex(settings.colorEnd);
+				}
+			}
+
+			PopEffects.LOGGER.info("Config auf Version 2 gehoben: Farben stehen jetzt als Hex-Code in der Datei");
+		}
+
+		config.configVersion = PopEffectsConfig.CURRENT_VERSION;
+	}
+
+	private static String decimalToHex(String raw) {
+		if (raw == null) {
+			return null;
+		}
+
+		try {
+			return EffectSettings.formatColor(Integer.parseInt(raw.trim()));
+		} catch (NumberFormatException e) {
+			// Steht schon als Hex drin - dann ist nichts zu tun.
+			return raw;
+		}
 	}
 
 	/** Setzt alles auf Werkseinstellungen zurueck. */

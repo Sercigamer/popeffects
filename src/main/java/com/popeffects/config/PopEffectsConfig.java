@@ -5,7 +5,11 @@ package com.popeffects.config;
  * Spielordner.
  */
 public final class PopEffectsConfig {
-	public static final int CURRENT_VERSION = 1;
+	/**
+	 * Version 2: Farben stehen als {@code "#RRGGBB"} in der Datei statt als
+	 * Dezimalzahl.
+	 */
+	public static final int CURRENT_VERSION = 2;
 
 	public int configVersion = CURRENT_VERSION;
 

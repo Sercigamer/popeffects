@@ -32,10 +32,14 @@
 
 	"popeffects.edit.tab.shape": "Form",
 	"popeffects.edit.tab.color": "Farbe",
-	"popeffects.edit.tab.extra": "Extras",
+	"popeffects.edit.tab.flow": "Ablauf",
+	"popeffects.edit.tab.sound": "Ton",
 
 	"popeffects.edit.style": "Stil",
 	"popeffects.edit.duration": "Dauer: %s Ticks",
+	"popeffects.edit.fade_in": "Einblenden: %s Ticks",
+	"popeffects.edit.fade_out": "Ausblenden: %s Ticks",
+	"popeffects.edit.fade_hint": "20 Ticks = 1 Sekunde · Ein- und Ausblenden zusammen höchstens so lang wie die Dauer",
 	"popeffects.edit.start_radius": "Startradius: %s",
 	"popeffects.edit.end_radius": "Endradius: %s",
 	"popeffects.edit.thickness": "Dicke: %s",
@@ -97,6 +101,7 @@
 	"popeffects.help.preview": "/pe <effekt> preview — Effekt vor dir abspielen",
 	"popeffects.help.style": "/pe <effekt> style <stil> — Form wählen",
 	"popeffects.help.color": "/pe <effekt> color start #FF5555 · color end #FFAA00 — Farben setzen",
+	"popeffects.help.fade": "/pe <effekt> fadein <ticks> · fadeout <ticks> — Ein- und Ausblenden",
 	"popeffects.help.threshold": "/pe <effekt> threshold <schaden> — ab wann er auslöst",
 	"popeffects.help.reset": "/pe reset — alles auf Werkseinstellungen",
 	"popeffects.help.keys": "Taste P öffnet das Menü (Optionen → Steuerung → Sonstiges)"

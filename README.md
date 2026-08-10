@@ -126,21 +126,20 @@ harte Kante.
 
 ## Alle Einstellungen
 
-Das Menü hat pro Effekt drei Reiter.
+Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 
 ### Reiter „Form"
 
 | Einstellung | Bedeutung |
 | --- | --- |
 | Stil | Eine der acht Formen |
-| Dauer | Lebensdauer in Ticks (20 Ticks = 1 Sekunde) |
 | Startradius / Endradius | Der Effekt wächst von einem zum anderen |
 | Dicke | Breite der Bänder in Blöcken |
 | Höhe | Für Kuppel, Kugel, Säule und Spirale |
+| Höhenversatz | Verschiebung nach oben, gemessen ab den Füßen |
 | Ecken | Auflösung der Ringe — mehr ist runder, aber teurer |
 | Ringe | Anzahl Ringe bei Schockwelle, Kuppel und Kugel; bei der Spirale die Windungen |
 | Drehung | Grad pro Sekunde, negativ dreht andersherum |
-| Höhenversatz | Verschiebung nach oben, gemessen ab den Füßen |
 | Folgt dem Ziel | An: der Effekt wandert mit. Aus: er bleibt liegen |
 
 ### Reiter „Farbe"
@@ -154,15 +153,34 @@ Das Menü hat pro Effekt drei Reiter.
 | Leuchten | Additives Mischen — kräftiger, sieht nach Neon aus |
 | Durch Wände | Der Effekt bleibt auch hinter Blöcken sichtbar |
 
-### Reiter „Extras"
+### Reiter „Ablauf"
 
 | Einstellung | Bedeutung |
 | --- | --- |
 | Effekt | Diesen Auslöser an- oder abschalten |
-| Sound abspielen, Klang, Lautstärke, Tonhöhe | Acht Vorschläge; eigene IDs gehen über die Config-Datei |
-| Partikel, Partikelart, Partikelanzahl | Vanilla-Partikel im Kreis um den Effekt |
+| Dauer | Lebensdauer in Ticks (20 Ticks = 1 Sekunde) |
+| Einblenden | So viele Ticks am Anfang wird aufgeblendet. 0 = sofort voll da |
+| Ausblenden | So viele Ticks am Ende wird ausgeblendet. 0 = harter Schnitt |
 | Schwelle | Ab wie viel Schaden ausgelöst wird (nur bei den Schadens-Effekten) |
 | Größe je Schaden | Ein harter Treffer erzeugt einen größeren Effekt, bis zum Dreifachen |
+
+Ein- und Ausblenden zählen in **Ticks, nicht in Prozent**. Stellst du die Dauer
+länger, bleibt das Ausblenden also genau so lang wie vorher — der Effekt steht
+dann einfach länger, bevor er weggeht.
+
+| kurz nach dem Pop | kurz vor Schluss |
+| --- | --- |
+| ![Effekt kurz nach dem Auslösen](docs/fade-fruh.png) | ![Derselbe Effekt beim Ausblenden](docs/fade-spaet.png) |
+
+Links die Schockwelle kurz nach dem Auslösen, rechts derselbe Effekt vier Ticks
+vor Schluss: größer geworden, zur Endfarbe gewandert und sichtbar blasser.
+
+### Reiter „Ton"
+
+| Einstellung | Bedeutung |
+| --- | --- |
+| Sound abspielen, Klang, Lautstärke, Tonhöhe | Acht Vorschläge; eigene IDs gehen über die Config-Datei |
+| Partikel, Partikelart, Partikelanzahl | Vanilla-Partikel im Kreis um den Effekt |
 
 Im Hauptmenü stehen zusätzlich **Reichweite** (wie weit weg Effekte noch
 gezeigt werden) und **Max. Effekte** (Notbremse gegen Effekt-Spam in großen
@@ -208,6 +226,8 @@ Dazu für jeden Effekt ein eigener Unterbaum. `<effekt>` ist `totem`, `damage`,
 | `/pe <effekt> color start <#RRGGBB>` | Startfarbe |
 | `/pe <effekt> color end <#RRGGBB>` | Endfarbe |
 | `/pe <effekt> duration <ticks>` | Lebensdauer |
+| `/pe <effekt> fadein <ticks>` | Einblendzeit |
+| `/pe <effekt> fadeout <ticks>` | Ausblendzeit |
 | `/pe <effekt> radius <blöcke>` | Endradius |
 | `/pe <effekt> threshold <schaden>` | Ab wann er auslöst |
 | `/pe <effekt> reset` | Nur diesen Effekt zurücksetzen |
@@ -216,10 +236,22 @@ Dazu für jeden Effekt ein eigener Unterbaum. `<effekt>` ist `totem`, `damage`,
 
 ## Die Config-Datei
 
-Alles landet in `config/popeffects.json` — lesbar formatiert, damit man
+Alles landet in `config/popeffects.json` — lesbar formatiert und nach Themen
+sortiert (erst was, dann Farbe, dann Zeit, dann Größe, zuletzt Ton), damit man
 Einstellungen auch von Hand ändern oder mit Freunden tauschen kann. Farben
-stehen dort als Zahl (`16733525` ist `#FF5555`); im Menü siehst du daneben
-immer den Hex-Code.
+stehen als Hex-Code drin, genau wie im Menü:
+
+```json
+"colorStart": "#FFD54A",
+"colorEnd": "#37D67A",
+"durationTicks": 28,
+"fadeInTicks": 2,
+"fadeOutTicks": 18,
+```
+
+Ältere Dateien aus Version 1.0.0 werden beim ersten Start automatisch
+umgeschrieben — dort standen Farben noch als Dezimalzahl (`16766282`). Deine
+Einstellungen bleiben dabei erhalten.
 
 Die Datei wird beim Laden geprüft: Werte außerhalb des sinnvollen Bereichs
 werden zurechtgerückt, fehlende Blöcke mit den Voreinstellungen aufgefüllt.

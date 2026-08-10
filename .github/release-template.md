@@ -20,6 +20,7 @@
 | Effekt ausprobieren | Im Menü auf *Vorschau* oder `/pe totem preview` |
 | Farbe ändern | `/pe totem color start #55FFFF` |
 | Form ändern | `/pe kill style sphere` |
+| Ausblenden einstellen | `/pe totem fadeout 20` |
 | Alle Befehle | `/pe help` |
 
 ## Die acht Stile

@@ -26,9 +26,6 @@ import net.minecraft.util.math.Vec3d;
  * selbst auch, sonst wird es weit weg vom Weltursprung ungenau.
  */
 public final class EffectRenderer {
-	/** Erster Teil der Lebensdauer, in dem der Effekt eingeblendet wird. */
-	private static final float FADE_IN = 0.15F;
-
 	private EffectRenderer() {
 	}
 
@@ -82,12 +79,13 @@ public final class EffectRenderer {
 		VertexConsumer consumer = consumers.getBuffer(PopRenderLayers.forEffect(settings.additive,
 				settings.throughWalls));
 
+		float ageTicks = effect.age() + tickDelta;
 		float progress = effect.progress(tickDelta);
-		float seconds = (effect.age() + tickDelta) / 20.0F;
+		float seconds = ageTicks / 20.0F;
 		float rotation = (float) Math.toRadians(effect.rotationOffset + settings.rotationSpeed * seconds);
 
 		int baseColor = baseColor(effect, progress, seconds);
-		int color = ColorMath.scaleAlpha(baseColor, fade(progress));
+		int color = ColorMath.scaleAlpha(baseColor, fade(settings, ageTicks));
 		int transparent = ColorMath.scaleAlpha(baseColor, 0.0F);
 
 		float radius = radiusAt(settings, progress) * effect.scale;
@@ -110,7 +108,11 @@ public final class EffectRenderer {
 					}
 
 					float ringRadius = radiusAt(settings, ringProgress) * effect.scale;
-					int ringColor = ColorMath.scaleAlpha(baseColor, fade(ringProgress));
+
+					// Jeder Ring blendet nach denselben Zeiten aus wie ein
+					// einzelner Effekt - gerechnet auf seiner eigenen Uhr.
+					int ringColor = ColorMath.scaleAlpha(baseColor,
+							fade(settings, ringProgress * settings.durationTicks));
 
 					softRing(consumer, matrix, y, ringRadius, half, settings.segments, rotation, ringColor,
 							transparent);
@@ -186,15 +188,31 @@ public final class EffectRenderer {
 		return 1.0F - inverse * inverse * inverse;
 	}
 
-	private static float fade(float progress) {
-		progress = MathHelper.clamp(progress, 0.0F, 1.0F);
+	/**
+	 * Deckkraft-Faktor von 0 bis 1, gebaut aus den eingestellten Ein- und
+	 * Ausblendzeiten.
+	 *
+	 * <p>Gerechnet wird in Ticks statt in Prozent: sonst wuerde ein laenger
+	 * eingestellter Effekt auch laenger ausblenden, obwohl man am Ausblenden
+	 * gar nichts geaendert hat.
+	 */
+	private static float fade(EffectSettings settings, float ageTicks) {
+		float factor = 1.0F;
 
-		if (progress < FADE_IN) {
-			return progress / FADE_IN;
+		if (settings.fadeInTicks > 0 && ageTicks < settings.fadeInTicks) {
+			factor = ageTicks / settings.fadeInTicks;
 		}
 
-		float remaining = (1.0F - progress) / (1.0F - FADE_IN);
-		return remaining * remaining;
+		float remaining = settings.durationTicks - ageTicks;
+
+		if (settings.fadeOutTicks > 0 && remaining < settings.fadeOutTicks) {
+			factor = Math.min(factor, remaining / settings.fadeOutTicks);
+		}
+
+		factor = MathHelper.clamp(factor, 0.0F, 1.0F);
+
+		// Weich statt linear - linear wirkt am Ende abgehackt.
+		return factor * factor * (3.0F - 2.0F * factor);
 	}
 
 	private static int baseColor(ActiveEffect effect, float progress, float seconds) {
@@ -208,11 +226,11 @@ public final class EffectRenderer {
 		}
 
 		if (settings.gradient) {
-			int start = ColorMath.argb(settings.alpha, settings.colorStart);
-			int end = ColorMath.argb(settings.alpha, settings.colorEnd);
+			int start = ColorMath.argb(settings.alpha, settings.colorStartRgb());
+			int end = ColorMath.argb(settings.alpha, settings.colorEndRgb());
 			return ColorMath.lerp(progress, start, end);
 		}
 
-		return ColorMath.argb(settings.alpha, settings.colorStart);
+		return ColorMath.argb(settings.alpha, settings.colorStartRgb());
 	}
 }

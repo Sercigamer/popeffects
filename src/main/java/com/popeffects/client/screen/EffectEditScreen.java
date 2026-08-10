@@ -19,19 +19,23 @@ import net.minecraft.util.Formatting;
 /**
  * Editor fuer einen einzelnen Effekt.
  *
- * <p>Drei Reiter, damit alles ohne Scrollen auf den Bildschirm passt: Form,
- * Farbe und Extras. Der Vorschau-Knopf setzt den Effekt vier Bloecke vor dich
- * in die Welt - so sieht man jede Aenderung sofort, ohne erst jemanden
- * verpruegeln zu muessen.
+ * <p>Vier Reiter mit je einem klaren Thema - Form, Farbe, Ablauf, Ton -, damit
+ * nichts scrollen muss und man nicht suchen muss, wo eine Einstellung steckt.
+ * Der Vorschau-Knopf setzt den Effekt vor dich in die Welt, so sieht man jede
+ * Aenderung sofort.
  */
 public class EffectEditScreen extends Screen {
 	private static final int TAB_SHAPE = 0;
 	private static final int TAB_COLOR = 1;
-	private static final int TAB_EXTRA = 2;
+	private static final int TAB_FLOW = 2;
+	private static final int TAB_SOUND = 3;
 
 	private static final int ROW_HEIGHT = 24;
 	private static final int COLUMN_WIDTH = 150;
 	private static final int FIRST_ROW = 60;
+
+	private static final int TAB_WIDTH = 76;
+	private static final int TAB_GAP = 5;
 
 	private final Screen parent;
 	private final TriggerType type;
@@ -50,14 +54,17 @@ public class EffectEditScreen extends Screen {
 	@Override
 	protected void init() {
 		int centerX = this.width / 2;
+		int tabX = centerX - (TAB_WIDTH * 4 + TAB_GAP * 3) / 2;
 
-		addTabButton(centerX - 155, TAB_SHAPE, "popeffects.edit.tab.shape");
-		addTabButton(centerX - 50, TAB_COLOR, "popeffects.edit.tab.color");
-		addTabButton(centerX + 55, TAB_EXTRA, "popeffects.edit.tab.extra");
+		addTabButton(tabX, TAB_SHAPE, "popeffects.edit.tab.shape");
+		addTabButton(tabX + (TAB_WIDTH + TAB_GAP), TAB_COLOR, "popeffects.edit.tab.color");
+		addTabButton(tabX + (TAB_WIDTH + TAB_GAP) * 2, TAB_FLOW, "popeffects.edit.tab.flow");
+		addTabButton(tabX + (TAB_WIDTH + TAB_GAP) * 3, TAB_SOUND, "popeffects.edit.tab.sound");
 
 		switch (tab) {
 			case TAB_COLOR -> initColorTab(centerX);
-			case TAB_EXTRA -> initExtraTab(centerX);
+			case TAB_FLOW -> initFlowTab(centerX);
+			case TAB_SOUND -> initSoundTab(centerX);
 			default -> initShapeTab(centerX);
 		}
 
@@ -81,7 +88,7 @@ public class EffectEditScreen extends Screen {
 		ButtonWidget button = ButtonWidget
 				.builder(tab == target ? label.copy().formatted(Formatting.YELLOW) : label,
 						widget -> this.client.setScreen(new EffectEditScreen(parent, type, target)))
-				.dimensions(x, 32, 100, 20).build();
+				.dimensions(x, 32, TAB_WIDTH, 20).build();
 
 		button.active = tab != target;
 		addDrawableChild(button);
@@ -97,20 +104,20 @@ public class EffectEditScreen extends Screen {
 				.build(leftX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.style"),
 						(button, value) -> settings.style = value));
 
-		addDrawableChild(new IntSliderWidget(leftX, row(1), COLUMN_WIDTH, 20, "popeffects.edit.duration", 3, 100,
-				settings.durationTicks, value -> settings.durationTicks = value));
-
-		addDrawableChild(new FloatSliderWidget(leftX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.start_radius", 0.0F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(1), COLUMN_WIDTH, 20, "popeffects.edit.start_radius", 0.0F,
 				12.0F, 0.1F, settings.startRadius, value -> settings.startRadius = value));
 
-		addDrawableChild(new FloatSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.end_radius", 0.2F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.end_radius", 0.2F,
 				16.0F, 0.1F, settings.endRadius, value -> settings.endRadius = value));
 
-		addDrawableChild(new FloatSliderWidget(leftX, row(4), COLUMN_WIDTH, 20, "popeffects.edit.thickness", 0.02F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.thickness", 0.02F,
 				2.0F, 0.02F, settings.thickness, value -> settings.thickness = value));
 
-		addDrawableChild(new FloatSliderWidget(leftX, row(5), COLUMN_WIDTH, 20, "popeffects.edit.height", 0.2F, 8.0F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(4), COLUMN_WIDTH, 20, "popeffects.edit.height", 0.2F, 8.0F,
 				0.1F, settings.height, value -> settings.height = value));
+
+		addDrawableChild(new FloatSliderWidget(leftX, row(5), COLUMN_WIDTH, 20, "popeffects.edit.y_offset", -2.0F,
+				4.0F, 0.05F, settings.yOffset, value -> settings.yOffset = value));
 
 		addDrawableChild(new IntSliderWidget(rightX, row(0), COLUMN_WIDTH, 20, "popeffects.edit.segments", 8, 96,
 				settings.segments, value -> settings.segments = value));
@@ -121,11 +128,8 @@ public class EffectEditScreen extends Screen {
 		addDrawableChild(new IntSliderWidget(rightX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.rotation", -360, 360,
 				(int) settings.rotationSpeed, value -> settings.rotationSpeed = value));
 
-		addDrawableChild(new FloatSliderWidget(rightX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.y_offset", -2.0F,
-				4.0F, 0.05F, settings.yOffset, value -> settings.yOffset = value));
-
 		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.followEntity)
-				.build(rightX, row(4), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.follow"),
+				.build(rightX, row(3), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.follow"),
 						(button, value) -> settings.followEntity = value));
 	}
 
@@ -134,28 +138,28 @@ public class EffectEditScreen extends Screen {
 		int rightX = centerX + 5;
 
 		addDrawableChild(new IntSliderWidget(leftX, row(0), COLUMN_WIDTH, 20, "popeffects.edit.start_red", 0, 255,
-				channel(settings.colorStart, 16),
-				value -> settings.colorStart = withChannel(settings.colorStart, 16, value)));
+				channel(settings.colorStartRgb(), 16),
+				value -> settings.setColorStartRgb(withChannel(settings.colorStartRgb(), 16, value))));
 
 		addDrawableChild(new IntSliderWidget(leftX, row(1), COLUMN_WIDTH, 20, "popeffects.edit.start_green", 0, 255,
-				channel(settings.colorStart, 8),
-				value -> settings.colorStart = withChannel(settings.colorStart, 8, value)));
+				channel(settings.colorStartRgb(), 8),
+				value -> settings.setColorStartRgb(withChannel(settings.colorStartRgb(), 8, value))));
 
 		addDrawableChild(new IntSliderWidget(leftX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.start_blue", 0, 255,
-				channel(settings.colorStart, 0),
-				value -> settings.colorStart = withChannel(settings.colorStart, 0, value)));
+				channel(settings.colorStartRgb(), 0),
+				value -> settings.setColorStartRgb(withChannel(settings.colorStartRgb(), 0, value))));
 
 		addDrawableChild(new IntSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.end_red", 0, 255,
-				channel(settings.colorEnd, 16),
-				value -> settings.colorEnd = withChannel(settings.colorEnd, 16, value)));
+				channel(settings.colorEndRgb(), 16),
+				value -> settings.setColorEndRgb(withChannel(settings.colorEndRgb(), 16, value))));
 
 		addDrawableChild(new IntSliderWidget(leftX, row(4), COLUMN_WIDTH, 20, "popeffects.edit.end_green", 0, 255,
-				channel(settings.colorEnd, 8),
-				value -> settings.colorEnd = withChannel(settings.colorEnd, 8, value)));
+				channel(settings.colorEndRgb(), 8),
+				value -> settings.setColorEndRgb(withChannel(settings.colorEndRgb(), 8, value))));
 
 		addDrawableChild(new IntSliderWidget(leftX, row(5), COLUMN_WIDTH, 20, "popeffects.edit.end_blue", 0, 255,
-				channel(settings.colorEnd, 0),
-				value -> settings.colorEnd = withChannel(settings.colorEnd, 0, value)));
+				channel(settings.colorEndRgb(), 0),
+				value -> settings.setColorEndRgb(withChannel(settings.colorEndRgb(), 0, value))));
 
 		addDrawableChild(new IntSliderWidget(rightX, row(0), COLUMN_WIDTH, 20, "popeffects.edit.alpha", 10, 255,
 				settings.alpha, value -> settings.alpha = value));
@@ -177,7 +181,7 @@ public class EffectEditScreen extends Screen {
 						(button, value) -> settings.throughWalls = value));
 	}
 
-	private void initExtraTab(int centerX) {
+	private void initFlowTab(int centerX) {
 		int leftX = centerX - COLUMN_WIDTH - 5;
 		int rightX = centerX + 5;
 
@@ -185,20 +189,45 @@ public class EffectEditScreen extends Screen {
 				.build(leftX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.enabled"),
 						(button, value) -> settings.enabled = value));
 
+		addDrawableChild(new IntSliderWidget(leftX, row(1), COLUMN_WIDTH, 20, "popeffects.edit.duration", 3, 100,
+				settings.durationTicks, value -> settings.durationTicks = value));
+
+		addDrawableChild(new IntSliderWidget(leftX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.fade_in", 0, 60,
+				settings.fadeInTicks, value -> settings.fadeInTicks = value));
+
+		addDrawableChild(new IntSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.fade_out", 0, 60,
+				settings.fadeOutTicks, value -> settings.fadeOutTicks = value));
+
+		// Schwelle und Groessenkopplung ergeben nur bei Schaden einen Sinn -
+		// ein Totem poppt nun mal ohne Schadenswert.
+		if (type == TriggerType.BIG_DAMAGE || type == TriggerType.SELF_HURT) {
+			addDrawableChild(new FloatSliderWidget(rightX, row(0), COLUMN_WIDTH, 20, "popeffects.edit.threshold", 0.5F,
+					40.0F, 0.5F, settings.threshold, value -> settings.threshold = value));
+
+			addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.scaleWithDamage)
+					.build(rightX, row(1), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.scale_with_damage"),
+							(button, value) -> settings.scaleWithDamage = value));
+		}
+	}
+
+	private void initSoundTab(int centerX) {
+		int leftX = centerX - COLUMN_WIDTH - 5;
+		int rightX = centerX + 5;
+
 		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.sound)
-				.build(leftX, row(1), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound"),
+				.build(leftX, row(0), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound"),
 						(button, value) -> settings.sound = value));
 
 		addDrawableChild(CyclingButtonWidget
 				.builder((String id) -> Text.literal(shortName(id)), settings.soundId)
 				.values(withCurrent(EffectSettings.SOUND_PRESETS, settings.soundId))
-				.build(leftX, row(2), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound_id"),
+				.build(leftX, row(1), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.sound_id"),
 						(button, value) -> settings.soundId = value));
 
-		addDrawableChild(new FloatSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.sound_volume", 0.0F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.sound_volume", 0.0F,
 				2.0F, 0.05F, settings.soundVolume, value -> settings.soundVolume = value));
 
-		addDrawableChild(new FloatSliderWidget(leftX, row(4), COLUMN_WIDTH, 20, "popeffects.edit.sound_pitch", 0.5F,
+		addDrawableChild(new FloatSliderWidget(leftX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.sound_pitch", 0.5F,
 				2.0F, 0.05F, settings.soundPitch, value -> settings.soundPitch = value));
 
 		addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.particles)
@@ -213,17 +242,6 @@ public class EffectEditScreen extends Screen {
 
 		addDrawableChild(new IntSliderWidget(rightX, row(2), COLUMN_WIDTH, 20, "popeffects.edit.particle_count", 0, 96,
 				settings.particleCount, value -> settings.particleCount = value));
-
-		// Schwelle und Groessenkopplung ergeben nur bei Schaden einen Sinn -
-		// ein Totem poppt nun mal ohne Schadenswert.
-		if (type == TriggerType.BIG_DAMAGE || type == TriggerType.SELF_HURT) {
-			addDrawableChild(new FloatSliderWidget(rightX, row(3), COLUMN_WIDTH, 20, "popeffects.edit.threshold", 0.5F,
-					40.0F, 0.5F, settings.threshold, value -> settings.threshold = value));
-
-			addDrawableChild(CyclingButtonWidget.onOffBuilder(settings.scaleWithDamage)
-					.build(rightX, row(4), COLUMN_WIDTH, 20, Text.translatable("popeffects.edit.scale_with_damage"),
-							(button, value) -> settings.scaleWithDamage = value));
-		}
 	}
 
 	@Override
@@ -234,6 +252,9 @@ public class EffectEditScreen extends Screen {
 
 		if (tab == TAB_COLOR) {
 			drawColorPreview(context);
+		} else if (tab == TAB_FLOW) {
+			Text hint = Text.translatable("popeffects.edit.fade_hint").formatted(Formatting.GRAY);
+			context.drawCenteredTextWithShadow(this.textRenderer, hint, this.width / 2, this.height - 68, 0xFFAAAAAA);
 		}
 	}
 
@@ -243,12 +264,12 @@ public class EffectEditScreen extends Screen {
 		int rightX = centerX + 5;
 		int y = row(5);
 
-		context.fill(rightX, y, rightX + 70, y + 20, 0xFF000000 | settings.colorStart);
-		context.fill(rightX + 80, y, rightX + COLUMN_WIDTH, y + 20, 0xFF000000 | settings.colorEnd);
+		context.fill(rightX, y, rightX + 70, y + 20, 0xFF000000 | settings.colorStartRgb());
+		context.fill(rightX + 80, y, rightX + COLUMN_WIDTH, y + 20, 0xFF000000 | settings.colorEndRgb());
 
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hex(settings.colorStart)), rightX + 35,
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorStart), rightX + 35,
 				y + 6, 0xFFFFFFFF);
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hex(settings.colorEnd)), rightX + 115,
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(settings.colorEnd), rightX + 115,
 				y + 6, 0xFFFFFFFF);
 	}
 
@@ -262,10 +283,6 @@ public class EffectEditScreen extends Screen {
 
 	private static int withChannel(int rgb, int shift, int value) {
 		return (rgb & ~(0xFF << shift)) | ((value & 0xFF) << shift);
-	}
-
-	private static String hex(int rgb) {
-		return String.format("#%06X", rgb & 0xFFFFFF);
 	}
 
 	/**
@@ -303,7 +320,8 @@ public class EffectEditScreen extends Screen {
 	@Override
 	public void removed() {
 		// Auch beim Wechsel des Reiters - dann geht nichts verloren, wenn das
-		// Spiel danach abstuerzt.
+		// Spiel danach abstuerzt. sanitize() kappt dabei Ein- und Ausblenden
+		// auf die Dauer, falls beide Regler zu weit aufgedreht wurden.
 		ConfigManager.get().sanitize();
 		ConfigManager.save();
 	}

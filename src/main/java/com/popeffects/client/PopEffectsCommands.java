@@ -97,6 +97,16 @@ public final class PopEffectsCommands {
 							ConfigManager.get().get(type).durationTicks = IntegerArgumentType.getInteger(ctx, "ticks");
 							return saved(ctx, type);
 						})))
+				.then(literal("fadein")
+						.then(argument("ticks", IntegerArgumentType.integer(0, 60)).executes(ctx -> {
+							ConfigManager.get().get(type).fadeInTicks = IntegerArgumentType.getInteger(ctx, "ticks");
+							return saved(ctx, type);
+						})))
+				.then(literal("fadeout")
+						.then(argument("ticks", IntegerArgumentType.integer(0, 60)).executes(ctx -> {
+							ConfigManager.get().get(type).fadeOutTicks = IntegerArgumentType.getInteger(ctx, "ticks");
+							return saved(ctx, type);
+						})))
 				.then(literal("radius")
 						.then(argument("blocks", FloatArgumentType.floatArg(0.2F, 32.0F)).executes(ctx -> {
 							ConfigManager.get().get(type).endRadius = FloatArgumentType.getFloat(ctx, "blocks");
@@ -126,6 +136,7 @@ public final class PopEffectsCommands {
 				"popeffects.help.preview",
 				"popeffects.help.style",
 				"popeffects.help.color",
+				"popeffects.help.fade",
 				"popeffects.help.threshold",
 				"popeffects.help.reset",
 				"popeffects.help.keys" }) {
@@ -220,15 +231,15 @@ public final class PopEffectsCommands {
 		EffectSettings settings = ConfigManager.get().get(type);
 
 		if (start) {
-			settings.colorStart = color;
+			settings.setColorStartRgb(color);
 		} else {
-			settings.colorEnd = color;
+			settings.setColorEndRgb(color);
 		}
 
 		ConfigManager.save();
 
 		return feedback(ctx, Text.translatable("popeffects.command.color_set",
-				Text.translatable(type.translationKey()), String.format("#%06X", color))
+				Text.translatable(type.translationKey()), EffectSettings.formatColor(color))
 				.formatted(Formatting.GREEN));
 	}
 
