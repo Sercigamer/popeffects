@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "popeffects",
+	"version": "${version}",
+	"name": "PopEffects",
+	"description": "Zeigt frei einstellbare Effekt-Kreise um Gegner, wenn sie ein Totem poppen, viel Schaden fressen oder sterben.",
+	"authors": [
+		"${github_user}"
+	],
+	"contact": {
+		"homepage": "https://github.com/${github_user}/${github_repo}",
+		"sources": "https://github.com/${github_user}/${github_repo}",
+		"issues": "https://github.com/${github_user}/${github_repo}/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/popeffects/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.popeffects.client.PopEffectsClient"
+		],
+		"modmenu": [
+			"com.popeffects.compat.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		{
+			"config": "popeffects.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

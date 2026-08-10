@@ -1,0 +1,98 @@
+plugins {
+	id 'fabric-loom' version "${loom_version}"
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	// Loom fuegt die Minecraft-/Fabric-Repositories selbst hinzu.
+	maven {
+		name = 'TerraformersMC'
+		url = uri('https://maven.terraformersmc.com/releases/')
+	}
+}
+
+loom {
+	runs {
+		client {
+			// Selbsttest und Direktstart in eine Welt, beides nur auf Zuruf:
+			//   ./gradlew runClient -Pselftest -Pworld="New World"
+			// Ohne die Schalter startet der Client ganz normal.
+			if (project.hasProperty('selftest')) {
+				property 'popeffects.selftest', 'true'
+			}
+
+			if (project.hasProperty('world')) {
+				programArgs '--quickPlaySingleplayer', project.property('world').toString()
+			}
+		}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Mod Menu ist optional: nur zum Kompilieren und im Dev-Client vorhanden,
+	// wird nicht mitgeliefert und nicht vorausgesetzt.
+	modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+	modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+}
+
+processResources {
+	inputs.property 'version', project.version
+	inputs.property 'github_user', project.github_user
+	inputs.property 'github_repo', project.github_repo
+
+	filesMatching('fabric.mod.json') {
+		expand 'version': inputs.properties.version,
+				'github_user': inputs.properties.github_user,
+				'github_repo': inputs.properties.github_repo
+	}
+}
+
+// Gleiche Eingabe soll das gleiche Jar ergeben - erleichtert das Vergleichen
+// von Builds und vermeidet unnoetige Unterschiede zwischen Rechner und CI.
+tasks.withType(AbstractArchiveTask).configureEach {
+	it.preserveFileTimestamps = false
+	it.reproducibleFileOrder = true
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+	it.options.encoding = 'UTF-8'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+
+	withSourcesJar()
+}
+
+jar {
+	from('LICENSE') {
+		rename { "${it}_${project.base.archivesName.get()}" }
+	}
+}
+
+publishing {
+	publications {
+		create('mavenJava', MavenPublication) {
+			artifactId = project.archives_base_name
+			from components.java
+		}
+	}
+
+	repositories {
+	}
+}
