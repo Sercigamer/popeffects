@@ -59,15 +59,25 @@ public final class EffectSettings {
 	/** Deckkraft 0-255, bevor das Ein- und Ausblenden daraufkommt. */
 	public int alpha = 200;
 
-	/** Additiv mischen - leuchtet staerker, sieht nach Neon aus. */
-	public boolean additive = true;
+	/**
+	 * Additiv mischen: die Farbe wird auf den Hintergrund addiert statt ihn zu
+	 * ueberdecken.
+	 *
+	 * <p>Standardmaessig aus. Additiv leuchtet zwar kraeftiger, aber die
+	 * Deckkraft steuert dann die Helligkeit statt der Durchsichtigkeit - eine
+	 * helle Farbe blueht auf dunklem Hintergrund auf und wirkt breiter, als
+	 * sie ist. Beim Ausblenden will man dagegen genau das Gegenteil: die Farbe
+	 * soll einfach durchsichtig werden.
+	 */
+	public boolean additive = false;
 
 	/**
 	 * Zeichnet hinter der Form zusaetzlich einen breiten, blassen Schein.
-	 * Kostet einen zweiten Durchgang, sieht dafuer nach Neonroehre aus statt
-	 * nach aufgeklebtem Band.
+	 *
+	 * <p>Standardmaessig aus, weil der Schein die Form sichtbar dicker macht.
+	 * Wer den Neonlook will, schaltet ihn ein.
 	 */
-	public boolean glow = true;
+	public boolean glow = false;
 
 	/** Auch durch Waende sichtbar. */
 	public boolean throughWalls = false;

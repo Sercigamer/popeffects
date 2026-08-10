@@ -27,10 +27,10 @@ import net.minecraft.util.math.Vec3d;
  */
 public final class EffectRenderer {
 	/** Wie viel breiter der Schein hinter der Form ist. */
-	private static final float GLOW_WIDTH = 3.2F;
+	private static final float GLOW_WIDTH = 2.2F;
 
 	/** Wie blass der Schein gegenueber der Form selbst ist. */
-	private static final float GLOW_ALPHA = 0.3F;
+	private static final float GLOW_ALPHA = 0.22F;
 
 	/** Um so viel duenner wird das Band bis zum Ende des Ausblendens. */
 	private static final float DISSOLVE_THINNING = 0.55F;
@@ -268,6 +268,11 @@ public final class EffectRenderer {
 	 * <p>Gerechnet wird in Ticks statt in Prozent: sonst wuerde ein laenger
 	 * eingestellter Effekt auch laenger ausblenden, obwohl man am Ausblenden
 	 * gar nichts geaendert hat.
+	 *
+	 * <p>Der Verlauf ist bewusst linear: die Farbe soll ueber die eingestellte
+	 * Zeit gleichmaessig durchsichtig werden. Eine weiche Kurve haelt den
+	 * Effekt erst lange fast voll sichtbar und laesst ihn dann schnell
+	 * wegkippen - das sieht aus, als wuerde er abgeschnitten.
 	 */
 	private static float fade(EffectSettings settings, float ageTicks) {
 		float factor = 1.0F;
@@ -282,7 +287,7 @@ public final class EffectRenderer {
 			factor = Math.min(factor, remaining / settings.fadeOutTicks);
 		}
 
-		return smooth(MathHelper.clamp(factor, 0.0F, 1.0F));
+		return MathHelper.clamp(factor, 0.0F, 1.0F);
 	}
 
 	/** Weiches Ein- und Auslaufen - linear wirkt an den Enden abgehackt. */

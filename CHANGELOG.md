@@ -4,6 +4,26 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.3.0] - 2026-08-10
+
+### Geändert
+
+- **Das Ausblenden macht die Farbe jetzt wirklich durchsichtig.** Vorher waren
+  additives Mischen und der Schein an: additiv addiert die Farbe auf den
+  Hintergrund, statt ihn zu überdecken — die Deckkraft steuerte damit die
+  Helligkeit und nicht die Durchsichtigkeit. Eine helle Farbe blühte auf
+  dunklem Hintergrund auf und der Ring wirkte dick. Beides ist jetzt aus,
+  bleibt aber als Schalter im Reiter „Farbe".
+- **Der Ring ist wieder eine dünne Linie.** Der Schein zeichnete eine mehrfach
+  breitere Kopie darunter — das war der fette Rand.
+- Die Deckkraft läuft **linear** auf null statt über eine weiche Kurve. Eine
+  weiche Kurve hält den Effekt erst lange fast voll sichtbar und lässt ihn dann
+  schnell wegkippen; linear wird er gleichmäßig durchsichtig und ist am Ende
+  der eingestellten Zeit exakt weg.
+- Der Schein ist schmaler und blasser, falls man ihn einschaltet.
+- Bestehende Configs werden auf Version 3 gehoben: Leuchten und Schein gehen
+  dabei aus.
+
 ## [1.2.0] - 2026-08-10
 
 ### Geändert
@@ -78,6 +98,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[1.3.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.0.0

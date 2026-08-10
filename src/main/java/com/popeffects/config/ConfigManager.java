@@ -84,6 +84,24 @@ public final class ConfigManager {
 			PopEffects.LOGGER.info("Config auf Version 2 gehoben: Farben stehen jetzt als Hex-Code in der Datei");
 		}
 
+		if (config.configVersion < 3) {
+			// Beides ueberdeckt das Ausblenden: additiv steuert die Deckkraft
+			// die Helligkeit statt der Durchsichtigkeit, und der Schein macht
+			// die Form breiter. Wer den Neonlook mochte, schaltet die beiden
+			// Schalter im Reiter "Farbe" wieder ein.
+			for (TriggerType type : TriggerType.values()) {
+				EffectSettings settings = config.get(type);
+
+				if (settings != null) {
+					settings.additive = false;
+					settings.glow = false;
+				}
+			}
+
+			PopEffects.LOGGER.info("Config auf Version 3 gehoben: Leuchten und Schein sind aus, "
+					+ "damit das Ausblenden die Farbe durchsichtig macht");
+		}
+
 		config.configVersion = PopEffectsConfig.CURRENT_VERSION;
 	}
 

@@ -42,7 +42,7 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 1. [Fabric Loader](https://fabricmc.net/use/installer/) für **1.21.11** installieren.
 2. [Fabric API](https://modrinth.com/mod/fabric-api) für 1.21.11 in den
    `mods`-Ordner legen. **Ohne sie startet die Mod nicht.**
-3. `popeffects-1.2.0.jar` daneben legen.
+3. `popeffects-1.3.0.jar` daneben legen.
 4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) — dann gibt es im
    Mod-Menü einen Zahnrad-Knopf zu PopEffects.
 
@@ -57,7 +57,7 @@ der Mod — die hier also, keine Forge-Version.
 1. Lunar-Client-Launcher öffnen.
 2. Links die Version **1.21.11** auswählen.
 3. Unten rechts auf *Einstellungen*, oben den Reiter **Mods** wählen.
-4. `popeffects-1.2.0.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
+4. `popeffects-1.3.0.jar` **und** `fabric-api-....jar` in das Fenster ziehen.
    Über den 📁-Knopf kommst du direkt in den Ordner, falls du lieber kopierst.
 5. Lunar Client neu starten.
 
@@ -116,8 +116,8 @@ Schadens-Effekte ausschließlich bei Gegnern, die *du* getroffen hast.
 | `crown` | Ein Kranz aus stehenden Zacken, der nach außen läuft |
 
 Ringe werden mit weichen Kanten gezeichnet: innen und außen läuft die Farbe
-auf null aus. Dazu kommt auf Wunsch ein breiter, blasser **Schein** hinter der
-Form — das ist der Unterschied zwischen aufgeklebtem Band und Neonröhre.
+auf null aus. Auf Wunsch legt sich zusätzlich ein breiter, blasser **Schein**
+dahinter — das ergibt den Neonlook, macht die Form aber dicker.
 
 | `ring` | `burst` | `crown` |
 | --- | --- | --- |
@@ -151,9 +151,16 @@ Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 | Farbverlauf | Blendet über die Lebensdauer von der Start- zur Endfarbe |
 | Regenbogen | Ignoriert beide Farben und dreht den Farbkreis durch |
 | Deckkraft | 10 bis 255 |
-| Leuchten | Additives Mischen — kräftiger, sieht nach Neon aus |
-| Schein | Breiter, blasser Halo hinter der Form — weicher Rand statt harter Kante |
+| Leuchten | Additives Mischen — kräftiger, aber die Deckkraft steuert dann Helligkeit statt Durchsichtigkeit. **Standardmäßig aus** |
+| Schein | Breiter, blasser Halo hinter der Form. Macht die Form sichtbar dicker, deshalb **standardmäßig aus** |
 | Durch Wände | Der Effekt bleibt auch hinter Blöcken sichtbar |
+
+**Leuchten** und **Schein** sind bewusst aus: beide arbeiten gegen ein sauberes
+Ausblenden. Additiv addiert Licht auf den Hintergrund, statt ihn zu überdecken —
+eine helle Farbe blüht dann auf und wirkt breiter, als sie ist. Der Schein legt
+zusätzlich eine mehrfach breitere Kopie darunter. Ohne beides bleibt der Ring
+eine dünne Linie, die über die eingestellte Zeit einfach durchsichtig wird. Wer
+den Neonlook will, schaltet sie einzeln dazu.
 
 ### Reiter „Ablauf"
 
@@ -180,8 +187,9 @@ statt auf den letzten Prozent stehenzubleiben und dann einfach weg zu sein.
 | ![Effekt kurz nach dem Auslösen](docs/fade-fruh.png) | ![Derselbe Effekt beim Ausblenden](docs/fade-spaet.png) |
 
 Derselbe Ring, einmal sechs und einmal zwanzig Ticks nach dem Auslösen: deutlich
-weiter außen, dünner, zur Endfarbe gewandert — und immer noch in Bewegung, als
-er verschwindet.
+weiter außen, dünner, zur Endfarbe gewandert — und durchsichtig genug, dass man
+den Boden hindurch sieht. Die Deckkraft läuft dabei gleichmäßig auf null, der
+Effekt ist also am Ende der eingestellten Zeit exakt unsichtbar.
 
 ### Reiter „Ton"
 

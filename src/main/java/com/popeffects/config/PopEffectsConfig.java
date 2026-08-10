@@ -8,8 +8,11 @@ public final class PopEffectsConfig {
 	/**
 	 * Version 2: Farben stehen als {@code "#RRGGBB"} in der Datei statt als
 	 * Dezimalzahl.
+	 *
+	 * <p>Version 3: Additives Mischen und der Schein sind aus, damit das
+	 * Ausblenden die Farbe wirklich durchsichtig macht.
 	 */
-	public static final int CURRENT_VERSION = 2;
+	public static final int CURRENT_VERSION = 3;
 
 	public int configVersion = CURRENT_VERSION;
 
