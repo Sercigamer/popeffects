@@ -1,6 +1,6 @@
 package com.popeffects.effect;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Kleine Farb-Helfer. Farben liegen ueberall als 0xAARRGGBB vor - genau so,
@@ -29,18 +29,18 @@ public final class ColorMath {
 
 	/** Deckkraft mit einem Faktor multiplizieren, z.B. zum Ausblenden. */
 	public static int scaleAlpha(int argb, float factor) {
-		int alpha = Math.round(alpha(argb) * MathHelper.clamp(factor, 0.0F, 1.0F));
+		int alpha = Math.round(alpha(argb) * Mth.clamp(factor, 0.0F, 1.0F));
 		return argb(alpha, argb);
 	}
 
 	/** Kanalweise mischen, Deckkraft eingeschlossen. */
 	public static int lerp(float delta, int from, int to) {
-		delta = MathHelper.clamp(delta, 0.0F, 1.0F);
+		delta = Mth.clamp(delta, 0.0F, 1.0F);
 
-		int a = MathHelper.lerp(delta, (from >>> 24) & 0xFF, (to >>> 24) & 0xFF);
-		int r = MathHelper.lerp(delta, (from >> 16) & 0xFF, (to >> 16) & 0xFF);
-		int g = MathHelper.lerp(delta, (from >> 8) & 0xFF, (to >> 8) & 0xFF);
-		int b = MathHelper.lerp(delta, from & 0xFF, to & 0xFF);
+		int a = Mth.lerpInt(delta, (from >>> 24) & 0xFF, (to >>> 24) & 0xFF);
+		int r = Mth.lerpInt(delta, (from >> 16) & 0xFF, (to >> 16) & 0xFF);
+		int g = Mth.lerpInt(delta, (from >> 8) & 0xFF, (to >> 8) & 0xFF);
+		int b = Mth.lerpInt(delta, from & 0xFF, to & 0xFF);
 
 		return (a << 24) | (r << 16) | (g << 8) | b;
 	}
@@ -49,6 +49,6 @@ public final class ColorMath {
 	 * Regenbogen: {@code hue} laeuft von 0 bis 1 einmal durch den Farbkreis.
 	 */
 	public static int rainbow(float hue) {
-		return MathHelper.hsvToRgb(hue - (float) Math.floor(hue), 1.0F, 1.0F) & 0xFFFFFF;
+		return Mth.hsvToRgb(hue - (float) Math.floor(hue), 1.0F, 1.0F) & 0xFFFFFF;
 	}
 }

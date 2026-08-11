@@ -8,11 +8,11 @@ import com.popeffects.effect.EffectManager;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Prueft, ob die Ausloeser im Spiel wirklich feuern.
@@ -76,8 +76,8 @@ public final class TriggerSelfTest {
 		PopEffects.LOGGER.info("Ausloeser-Test aktiv - prueft Totem, Schaden und Kill mit echten Ereignissen");
 	}
 
-	private static void tick(MinecraftClient client) {
-		if (ticksUntilNextStep < 0 || client.player == null || client.getServer() == null) {
+	private static void tick(Minecraft client) {
+		if (ticksUntilNextStep < 0 || client.player == null || client.getSingleplayerServer() == null) {
 			return;
 		}
 
@@ -137,7 +137,7 @@ public final class TriggerSelfTest {
 							failures);
 				}
 
-				client.scheduleStop();
+				client.stop();
 			}
 			default -> ticksUntilNextStep = -1;
 		}
@@ -167,8 +167,8 @@ public final class TriggerSelfTest {
 	 * davon, ob in der Welt Cheats erlaubt sind. Angebunden an den Spieler,
 	 * damit {@code @s} und {@code ~ ~ ~} das Erwartete treffen.
 	 */
-	private static void run(MinecraftClient client, String command) {
-		MinecraftServer server = client.getServer();
+	private static void run(Minecraft client, String command) {
+		MinecraftServer server = client.getSingleplayerServer();
 
 		if (server == null) {
 			return;
@@ -176,9 +176,9 @@ public final class TriggerSelfTest {
 
 		// Befehle gehoeren auf den Server-Thread, nicht in den Client-Tick.
 		server.execute(() -> {
-			ServerPlayerEntity player = server.getPlayerManager().getPlayerList().isEmpty()
+			ServerPlayer player = server.getPlayerList().getPlayers().isEmpty()
 					? null
-					: server.getPlayerManager().getPlayerList().get(0);
+					: server.getPlayerList().getPlayers().get(0);
 
 			if (player == null) {
 				return;
@@ -190,9 +190,9 @@ public final class TriggerSelfTest {
 			// Bewusst nicht stumm: schlaegt ein Befehl fehl, soll der Grund im
 			// Log stehen. Ein stiller Test, der aus dem falschen Grund
 			// durchfaellt, ist schlimmer als gar keiner.
-			ServerCommandSource source = server.getCommandSource()
+			CommandSourceStack source = server.createCommandSourceStack()
 					.withEntity(player)
-					.withPosition(new Vec3d(player.getX(), player.getY(), player.getZ()));
+					.withPosition(new Vec3(player.getX(), player.getY(), player.getZ()));
 
 			CommandCompat.run(server, source, command);
 		});

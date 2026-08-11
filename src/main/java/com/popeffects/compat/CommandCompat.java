@@ -1,7 +1,7 @@
 package com.popeffects.compat;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 /**
  * Fuehrt einen Befehl auf dem eingebauten Server aus.
@@ -13,7 +13,7 @@ public final class CommandCompat {
 	private CommandCompat() {
 	}
 
-	public static void run(MinecraftServer server, ServerCommandSource source, String command) {
-		server.getCommandManager().parseAndExecute(source, command);
+	public static void run(MinecraftServer server, CommandSourceStack source, String command) {
+		server.getCommands().performPrefixedCommand(source, command);
 	}
 }

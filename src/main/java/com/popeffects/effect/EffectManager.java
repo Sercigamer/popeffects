@@ -11,18 +11,18 @@ import com.popeffects.config.EffectSettings;
 import com.popeffects.config.PopEffectsConfig;
 import com.popeffects.config.TriggerType;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Haelt die laufenden Effekte, startet neue und raeumt fertige weg.
@@ -75,13 +75,13 @@ public final class EffectManager {
 			return;
 		}
 
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
-		if (client.player == null || client.world == null) {
+		if (client.player == null || client.level == null) {
 			return;
 		}
 
-		if (target.squaredDistanceTo(client.player) > config.maxDistance * config.maxDistance) {
+		if (target.distanceToSqr(client.player) > config.maxDistance * config.maxDistance) {
 			return;
 		}
 
@@ -97,13 +97,13 @@ public final class EffectManager {
 			scale = Math.min(3.0F, Math.max(1.0F, amount / settings.threshold));
 		}
 
-		Vec3d position = new Vec3d(target.getX(), target.getY(), target.getZ());
-		float rotationOffset = client.world.getRandom().nextFloat() * 360.0F;
+		Vec3 position = new Vec3(target.getX(), target.getY(), target.getZ());
+		float rotationOffset = client.level.getRandom().nextFloat() * 360.0F;
 
 		ACTIVE.add(new ActiveEffect(type, settings.copy(), position, target.getId(), scale, rotationOffset));
 
 		playSound(client, settings, position);
-		spawnParticles(client.world, settings, position, scale);
+		spawnParticles(client.level, settings, position, scale);
 
 		if (type == TriggerType.TOTEM_POP && config.popCounter) {
 			PopCounter.record(target);
@@ -120,31 +120,31 @@ public final class EffectManager {
 	 * passen, statt dass man mitten drin steht.
 	 */
 	public static void preview(TriggerType type, EffectSettings settings) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
-		if (client.player == null || client.world == null) {
+		if (client.player == null || client.level == null) {
 			return;
 		}
 
-		Vec3d look = client.player.getRotationVector();
-		Vec3d position = new Vec3d(client.player.getX() + look.x * 7.0D, client.player.getY(),
+		Vec3 look = client.player.getLookAngle();
+		Vec3 position = new Vec3(client.player.getX() + look.x * 7.0D, client.player.getY(),
 				client.player.getZ() + look.z * 7.0D);
-		float rotationOffset = client.world.getRandom().nextFloat() * 360.0F;
+		float rotationOffset = client.level.getRandom().nextFloat() * 360.0F;
 
 		// Entity-ID -1 gibt es nicht, dadurch bleibt der Effekt liegen, auch
 		// wenn "folgt dem Ziel" an ist.
 		ACTIVE.add(new ActiveEffect(type, settings.copy(), position, -1, 1.0F, rotationOffset));
 
 		playSound(client, settings, position);
-		spawnParticles(client.world, settings, position, 1.0F);
+		spawnParticles(client.level, settings, position, 1.0F);
 	}
 
-	public static void tick(MinecraftClient client) {
+	public static void tick(Minecraft client) {
 		if (ACTIVE.isEmpty()) {
 			return;
 		}
 
-		ClientWorld world = client.world;
+		ClientLevel world = client.level;
 
 		if (world == null) {
 			ACTIVE.clear();
@@ -155,7 +155,7 @@ public final class EffectManager {
 
 		while (iterator.hasNext()) {
 			ActiveEffect effect = iterator.next();
-			effect.tick(world.getEntityById(effect.entityId()));
+			effect.tick(world.getEntity(effect.entityId()));
 
 			if (effect.isFinished()) {
 				iterator.remove();
@@ -164,22 +164,22 @@ public final class EffectManager {
 	}
 
 	private static boolean passesTargetFilter(PopEffectsConfig config, Entity target) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 		boolean self = client.player != null && target.getId() == client.player.getId();
 
 		if (self) {
 			return config.showOnSelf;
 		}
 
-		if (target instanceof PlayerEntity) {
+		if (target instanceof Player) {
 			return config.showOnPlayers;
 		}
 
 		return config.showOnMobs;
 	}
 
-	private static void playSound(MinecraftClient client, EffectSettings settings, Vec3d position) {
-		if (!settings.sound || settings.soundVolume <= 0.0F || client.world == null) {
+	private static void playSound(Minecraft client, EffectSettings settings, Vec3 position) {
+		if (!settings.sound || settings.soundVolume <= 0.0F || client.level == null) {
 			return;
 		}
 
@@ -189,7 +189,7 @@ public final class EffectManager {
 			return;
 		}
 
-		SoundEvent event = Registries.SOUND_EVENT.get(id);
+		SoundEvent event = BuiltInRegistries.SOUND_EVENT.getValue(id);
 
 		if (event == null) {
 			// Unbekannte IDs sind erlaubt (Resourcepacks), aber ohne
@@ -198,12 +198,12 @@ public final class EffectManager {
 			return;
 		}
 
-		client.getSoundManager().play(new PositionedSoundInstance(event, SoundCategory.PLAYERS,
-				settings.soundVolume, settings.soundPitch, client.world.getRandom(),
+		client.getSoundManager().play(new SimpleSoundInstance(event, SoundSource.PLAYERS,
+				settings.soundVolume, settings.soundPitch, client.level.getRandom(),
 				position.x, position.y + 1.0D, position.z));
 	}
 
-	private static void spawnParticles(ClientWorld world, EffectSettings settings, Vec3d position, float scale) {
+	private static void spawnParticles(ClientLevel world, EffectSettings settings, Vec3 position, float scale) {
 		if (!settings.particles || settings.particleCount <= 0) {
 			return;
 		}
@@ -214,11 +214,11 @@ public final class EffectManager {
 			return;
 		}
 
-		ParticleType<?> type = Registries.PARTICLE_TYPE.get(id);
+		ParticleType<?> type = BuiltInRegistries.PARTICLE_TYPE.getValue(id);
 
 		// Partikel mit Extra-Daten (Block-, Staub- oder Item-Partikel) lassen
 		// sich nicht ohne Zusatzangaben erzeugen - die lassen wir hier weg.
-		if (!(type instanceof ParticleEffect effect)) {
+		if (!(type instanceof ParticleOptions effect)) {
 			PopEffects.LOGGER.warn("Partikel {} laesst sich nicht ohne Zusatzdaten erzeugen", settings.particleId);
 			return;
 		}
@@ -231,7 +231,7 @@ public final class EffectManager {
 			double z = position.z + Math.sin(angle) * radius;
 			double y = position.y + settings.yOffset + 0.1D;
 
-			world.addParticleClient(effect, x, y, z, Math.cos(angle) * 0.08D, 0.06D, Math.sin(angle) * 0.08D);
+			world.addParticle(effect, x, y, z, Math.cos(angle) * 0.08D, 0.06D, Math.sin(angle) * 0.08D);
 		}
 	}
 }

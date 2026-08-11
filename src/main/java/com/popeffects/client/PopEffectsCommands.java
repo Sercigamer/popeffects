@@ -1,7 +1,7 @@
 package com.popeffects.client;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
 import java.util.Locale;
 
@@ -18,8 +18,8 @@ import com.popeffects.effect.EffectManager;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * {@code /popeffects} (kurz: {@code /pe}) - laeuft komplett clientseitig, der
@@ -41,7 +41,7 @@ public final class PopEffectsCommands {
 					.then(literal("reset").executes(ctx -> {
 						ConfigManager.reset();
 						return feedback(ctx,
-								Text.translatable("popeffects.command.reset_all").formatted(Formatting.GREEN));
+								Component.translatable("popeffects.command.reset_all").withStyle(ChatFormatting.GREEN));
 					}));
 
 			for (TriggerType type : TriggerType.values()) {
@@ -69,8 +69,8 @@ public final class PopEffectsCommands {
 				}))
 				.then(literal("reset").executes(ctx -> {
 					ConfigManager.reset(type);
-					return feedback(ctx, Text.translatable("popeffects.command.reset_one",
-							Text.translatable(type.translationKey())).formatted(Formatting.GREEN));
+					return feedback(ctx, Component.translatable("popeffects.command.reset_one",
+							Component.translatable(type.translationKey())).withStyle(ChatFormatting.GREEN));
 				}))
 				.then(literal("style")
 						.then(argument("style", StringArgumentType.word())
@@ -140,7 +140,7 @@ public final class PopEffectsCommands {
 				"popeffects.help.threshold",
 				"popeffects.help.reset",
 				"popeffects.help.keys" }) {
-			source.sendFeedback(Text.translatable(line).formatted(Formatting.GRAY));
+			source.sendFeedback(Component.translatable(line).withStyle(ChatFormatting.GRAY));
 		}
 
 		return 1;
@@ -149,17 +149,17 @@ public final class PopEffectsCommands {
 	private static int status(CommandContext<FabricClientCommandSource> ctx) {
 		FabricClientCommandSource source = ctx.getSource();
 		source.sendFeedback(header());
-		source.sendFeedback(Text.translatable("popeffects.command.status.enabled", onOff(ConfigManager.get().enabled))
-				.formatted(Formatting.GRAY));
+		source.sendFeedback(Component.translatable("popeffects.command.status.enabled", onOff(ConfigManager.get().enabled))
+				.withStyle(ChatFormatting.GRAY));
 
 		for (TriggerType type : TriggerType.values()) {
 			EffectSettings settings = ConfigManager.get().get(type);
 
-			source.sendFeedback(Text.translatable("popeffects.command.status.effect",
-					Text.translatable(type.translationKey()).formatted(Formatting.WHITE),
+			source.sendFeedback(Component.translatable("popeffects.command.status.effect",
+					Component.translatable(type.translationKey()).withStyle(ChatFormatting.WHITE),
 					onOff(settings.enabled),
-					Text.translatable(settings.style.translationKey()).formatted(Formatting.AQUA))
-					.formatted(Formatting.GRAY));
+					Component.translatable(settings.style.translationKey()).withStyle(ChatFormatting.AQUA))
+					.withStyle(ChatFormatting.GRAY));
 		}
 
 		return 1;
@@ -168,11 +168,11 @@ public final class PopEffectsCommands {
 	private static int effectStatus(CommandContext<FabricClientCommandSource> ctx, TriggerType type) {
 		EffectSettings settings = ConfigManager.get().get(type);
 
-		ctx.getSource().sendFeedback(Text.translatable("popeffects.command.status.effect",
-				Text.translatable(type.translationKey()).formatted(Formatting.WHITE),
+		ctx.getSource().sendFeedback(Component.translatable("popeffects.command.status.effect",
+				Component.translatable(type.translationKey()).withStyle(ChatFormatting.WHITE),
 				onOff(settings.enabled),
-				Text.translatable(settings.style.translationKey()).formatted(Formatting.AQUA))
-				.formatted(Formatting.GRAY));
+				Component.translatable(settings.style.translationKey()).withStyle(ChatFormatting.AQUA))
+				.withStyle(ChatFormatting.GRAY));
 
 		return 1;
 	}
@@ -185,8 +185,8 @@ public final class PopEffectsCommands {
 			EffectManager.clear();
 		}
 
-		return feedback(ctx, Text.translatable(enabled ? "popeffects.message.enabled" : "popeffects.message.disabled")
-				.formatted(enabled ? Formatting.GREEN : Formatting.GRAY));
+		return feedback(ctx, Component.translatable(enabled ? "popeffects.message.enabled" : "popeffects.message.disabled")
+				.withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.GRAY));
 	}
 
 	private static int setEffectEnabled(CommandContext<FabricClientCommandSource> ctx, TriggerType type,
@@ -194,8 +194,8 @@ public final class PopEffectsCommands {
 		ConfigManager.get().get(type).enabled = enabled;
 		ConfigManager.save();
 
-		return feedback(ctx, Text.translatable("popeffects.command.effect_toggled",
-				Text.translatable(type.translationKey()), onOff(enabled)).formatted(Formatting.GRAY));
+		return feedback(ctx, Component.translatable("popeffects.command.effect_toggled",
+				Component.translatable(type.translationKey()), onOff(enabled)).withStyle(ChatFormatting.GRAY));
 	}
 
 	private static int setStyle(CommandContext<FabricClientCommandSource> ctx, TriggerType type) {
@@ -206,13 +206,13 @@ public final class PopEffectsCommands {
 				ConfigManager.get().get(type).style = style;
 				ConfigManager.save();
 
-				return feedback(ctx, Text.translatable("popeffects.command.style_set",
-						Text.translatable(type.translationKey()), Text.translatable(style.translationKey()))
-						.formatted(Formatting.GREEN));
+				return feedback(ctx, Component.translatable("popeffects.command.style_set",
+						Component.translatable(type.translationKey()), Component.translatable(style.translationKey()))
+						.withStyle(ChatFormatting.GREEN));
 			}
 		}
 
-		ctx.getSource().sendError(Text.translatable("popeffects.command.unknown_style", raw.toLowerCase(Locale.ROOT)));
+		ctx.getSource().sendError(Component.translatable("popeffects.command.unknown_style", raw.toLowerCase(Locale.ROOT)));
 		return 0;
 	}
 
@@ -224,7 +224,7 @@ public final class PopEffectsCommands {
 		try {
 			color = Integer.parseInt(raw, 16) & 0xFFFFFF;
 		} catch (NumberFormatException e) {
-			ctx.getSource().sendError(Text.translatable("popeffects.command.bad_color", raw));
+			ctx.getSource().sendError(Component.translatable("popeffects.command.bad_color", raw));
 			return 0;
 		}
 
@@ -238,20 +238,20 @@ public final class PopEffectsCommands {
 
 		ConfigManager.save();
 
-		return feedback(ctx, Text.translatable("popeffects.command.color_set",
-				Text.translatable(type.translationKey()), EffectSettings.formatColor(color))
-				.formatted(Formatting.GREEN));
+		return feedback(ctx, Component.translatable("popeffects.command.color_set",
+				Component.translatable(type.translationKey()), EffectSettings.formatColor(color))
+				.withStyle(ChatFormatting.GREEN));
 	}
 
 	private static int saved(CommandContext<FabricClientCommandSource> ctx, TriggerType type) {
 		ConfigManager.get().sanitize();
 		ConfigManager.save();
 
-		return feedback(ctx, Text.translatable("popeffects.command.saved", Text.translatable(type.translationKey()))
-				.formatted(Formatting.GREEN));
+		return feedback(ctx, Component.translatable("popeffects.command.saved", Component.translatable(type.translationKey()))
+				.withStyle(ChatFormatting.GREEN));
 	}
 
-	private static int feedback(CommandContext<FabricClientCommandSource> ctx, Text message) {
+	private static int feedback(CommandContext<FabricClientCommandSource> ctx, Component message) {
 		ctx.getSource().sendFeedback(message);
 		return 1;
 	}
@@ -265,12 +265,12 @@ public final class PopEffectsCommands {
 		};
 	}
 
-	private static Text onOff(boolean value) {
-		return Text.translatable(value ? "popeffects.generic.on" : "popeffects.generic.off")
-				.formatted(value ? Formatting.GREEN : Formatting.RED);
+	private static Component onOff(boolean value) {
+		return Component.translatable(value ? "popeffects.generic.on" : "popeffects.generic.off")
+				.withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED);
 	}
 
-	private static Text header() {
-		return Text.literal("PopEffects").formatted(Formatting.GOLD, Formatting.BOLD);
+	private static Component header() {
+		return Component.literal("PopEffects").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
 	}
 }

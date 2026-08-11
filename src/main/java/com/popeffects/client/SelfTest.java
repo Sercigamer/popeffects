@@ -11,8 +11,8 @@ import com.popeffects.effect.EffectManager;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
 
 /**
  * Spielt nach dem Betreten einer Welt einmal jeden Effekt-Stil ab und legt von
@@ -90,7 +90,7 @@ public final class SelfTest {
 		PopEffects.LOGGER.info("Selbsttest aktiv - spielt nach dem Beitreten alle Stile ab");
 	}
 
-	private static void tick(MinecraftClient client) {
+	private static void tick(Minecraft client) {
 		if (ticksUntilNextStep < 0 || client.player == null) {
 			return;
 		}
@@ -103,7 +103,7 @@ public final class SelfTest {
 			case AIM -> {
 				// Der Effekt erscheint vor dem Spieler - also leicht nach
 				// unten schauen, damit er sicher im Bild ist.
-				client.player.setPitch(TEST_PITCH);
+				client.player.setXRot(TEST_PITCH);
 				phase = Phase.BASELINE;
 				ticksUntilNextStep = AIM_SETTLE_TICKS;
 			}
@@ -130,7 +130,7 @@ public final class SelfTest {
 		}
 	}
 
-	private static void spawnNextStyle(MinecraftClient client) {
+	private static void spawnNextStyle(Minecraft client) {
 		EffectStyle[] styles = EffectStyle.values();
 
 		if (nextStyle >= styles.length) {
@@ -140,7 +140,7 @@ public final class SelfTest {
 			// Danach beenden. Sonst bleibt das Fenster offen, haelt den
 			// Weltordner gesperrt und der naechste Durchlauf kommt gar nicht
 			// erst hinein.
-			client.scheduleStop();
+			client.stop();
 			return;
 		}
 
@@ -162,14 +162,19 @@ public final class SelfTest {
 		ticksUntilNextStep = EARLY_SHOT_AT;
 	}
 
-	private static void screenshot(MinecraftClient client, String suffix) {
+	private static void screenshot(Minecraft client, String suffix) {
 		screenshotNamed(client, "selftest-" + currentStyle.name().toLowerCase(Locale.ROOT) + "-" + suffix + ".png");
 	}
 
-	private static void screenshotNamed(MinecraftClient client, String name) {
-		File directory = new File(client.runDirectory, ScreenshotRecorder.SCREENSHOTS_DIRECTORY);
-
-		ScreenshotRecorder.saveScreenshot(client.runDirectory, name, client.getFramebuffer(), 1,
-				message -> PopEffects.LOGGER.info("Selbsttest-Bild: {}", new File(directory, name)));
+	/**
+	 * In 26.x kommt man an das Render-Ziel nicht mehr ohne Weiteres heran, die
+	 * Aufnahme bekommt deshalb den automatischen Zeitstempel-Namen. Der
+	 * gewuenschte Name landet stattdessen im Log - die Bilder in
+	 * {@code screenshots/} stehen in derselben Reihenfolge, das genuegt zum
+	 * Vergleichen.
+	 */
+	private static void screenshotNamed(Minecraft client, String name) {
+		PopEffects.LOGGER.info("Selbsttest-Bild: {}", name);
+		Screenshot.grab(client, false);
 	}
 }

@@ -2,14 +2,14 @@ package com.popeffects.client.screen;
 
 import java.util.function.Consumer;
 
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.Component;
 
 /**
  * Schieberegler fuer Kommazahlen. Der Wert rastet auf {@code step} ein, damit
  * im Menue nicht "2,7391" steht.
  */
-public class FloatSliderWidget extends SliderWidget {
+public class FloatSliderWidget extends AbstractSliderButton {
 	private String translationKey;
 	private float min;
 	private float max;
@@ -18,7 +18,7 @@ public class FloatSliderWidget extends SliderWidget {
 
 	public FloatSliderWidget(int x, int y, int width, int height, String translationKey, float min, float max,
 			float step, float current, Consumer<Float> setter) {
-		super(x, y, width, height, Text.empty(), toSliderValue(current, min, max));
+		super(x, y, width, height, Component.empty(), toSliderValue(current, min, max));
 
 		this.translationKey = translationKey;
 		this.min = min;
@@ -49,7 +49,7 @@ public class FloatSliderWidget extends SliderWidget {
 			return;
 		}
 
-		setMessage(Text.translatable(translationKey, String.format("%.2f", getFloatValue())));
+		setMessage(Component.translatable(translationKey, String.format("%.2f", getFloatValue())));
 	}
 
 	@Override

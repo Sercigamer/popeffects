@@ -9,20 +9,20 @@ import com.popeffects.config.TriggerType;
 import com.popeffects.effect.EffectManager;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * Tastenbelegungen. Standard: {@code P} oeffnet das Menue, der Rest ist frei -
  * die Mod soll niemandem eine Taste wegnehmen.
  */
 public final class PopEffectsKeybinds {
-	public static KeyBinding openConfig;
-	public static KeyBinding toggleMod;
-	public static KeyBinding preview;
+	public static KeyMapping openConfig;
+	public static KeyMapping toggleMod;
+	public static KeyMapping preview;
 
 	/**
 	 * Ein Screen darf nicht mitten aus einem Command heraus geoeffnet werden -
@@ -39,33 +39,33 @@ public final class PopEffectsKeybinds {
 	}
 
 	public static void register() {
-		openConfig = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.popeffects.open_config", GLFW.GLFW_KEY_P, KeyBinding.Category.MISC));
+		openConfig = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+				"key.popeffects.open_config", GLFW.GLFW_KEY_P, KeyMapping.Category.MISC));
 
-		toggleMod = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.popeffects.toggle_mod", GLFW.GLFW_KEY_UNKNOWN, KeyBinding.Category.MISC));
+		toggleMod = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+				"key.popeffects.toggle_mod", GLFW.GLFW_KEY_UNKNOWN, KeyMapping.Category.MISC));
 
-		preview = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.popeffects.preview", GLFW.GLFW_KEY_UNKNOWN, KeyBinding.Category.MISC));
+		preview = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+				"key.popeffects.preview", GLFW.GLFW_KEY_UNKNOWN, KeyMapping.Category.MISC));
 
 		ClientTickEvents.END_CLIENT_TICK.register(PopEffectsKeybinds::onTick);
 	}
 
-	private static void onTick(MinecraftClient client) {
-		while (openConfig.wasPressed()) {
+	private static void onTick(Minecraft client) {
+		while (openConfig.consumeClick()) {
 			requestConfigScreen();
 		}
 
-		if (configScreenRequested && client.currentScreen == null) {
+		if (configScreenRequested) {
 			configScreenRequested = false;
-			client.setScreen(new PopEffectsConfigScreen(null));
+			client.setScreenAndShow(new PopEffectsConfigScreen(null));
 		}
 
 		if (client.player == null) {
 			return;
 		}
 
-		while (toggleMod.wasPressed()) {
+		while (toggleMod.consumeClick()) {
 			PopEffectsConfig config = ConfigManager.get();
 			config.enabled = !config.enabled;
 			ConfigManager.save();
@@ -74,13 +74,13 @@ public final class PopEffectsKeybinds {
 				EffectManager.clear();
 			}
 
-			client.player.sendMessage(Text.translatable(config.enabled
+			client.player.sendOverlayMessage(Component.translatable(config.enabled
 					? "popeffects.message.enabled"
 					: "popeffects.message.disabled")
-					.formatted(config.enabled ? Formatting.GREEN : Formatting.GRAY), true);
+					.withStyle(config.enabled ? ChatFormatting.GREEN : ChatFormatting.GRAY));
 		}
 
-		while (preview.wasPressed()) {
+		while (preview.consumeClick()) {
 			EffectManager.preview(TriggerType.TOTEM_POP, ConfigManager.get().totemPop);
 		}
 	}

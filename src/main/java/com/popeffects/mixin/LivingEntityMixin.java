@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.popeffects.trigger.PopTriggers;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.TrackedData;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.syncher.EntityDataAccessor;
 
 /**
  * Misst, wie viel Leben ein Gegner verliert.
@@ -30,7 +30,7 @@ public abstract class LivingEntityMixin {
 	private float popeffects$knownHealth = Float.NaN;
 
 	@Inject(method = "onTrackedDataSet", at = @At("TAIL"))
-	private void popeffects$watchHealth(TrackedData<?> data, CallbackInfo ci) {
+	private void popeffects$watchHealth(EntityDataAccessor<?> data, CallbackInfo ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
 
 		float now = self.getHealth();

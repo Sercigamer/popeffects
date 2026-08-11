@@ -3,8 +3,8 @@ package com.popeffects.effect;
 import com.popeffects.config.EffectSettings;
 import com.popeffects.config.TriggerType;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Ein Effekt, der gerade laeuft. Die Einstellungen sind eine Kopie: dreht man
@@ -18,10 +18,10 @@ public final class ActiveEffect {
 
 	private final int entityId;
 
-	private Vec3d position;
+	private Vec3 position;
 	private int age;
 
-	public ActiveEffect(TriggerType trigger, EffectSettings settings, Vec3d position, int entityId, float scale,
+	public ActiveEffect(TriggerType trigger, EffectSettings settings, Vec3 position, int entityId, float scale,
 			float rotationOffset) {
 		this.trigger = trigger;
 		this.settings = settings;
@@ -31,7 +31,7 @@ public final class ActiveEffect {
 		this.rotationOffset = rotationOffset;
 	}
 
-	public Vec3d position() {
+	public Vec3 position() {
 		return position;
 	}
 
@@ -61,7 +61,7 @@ public final class ActiveEffect {
 		age++;
 
 		if (settings.followEntity && tracked != null && tracked.isAlive()) {
-			position = new Vec3d(tracked.getX(), tracked.getY(), tracked.getZ());
+			position = new Vec3(tracked.getX(), tracked.getY(), tracked.getZ());
 		}
 	}
 
@@ -69,9 +69,9 @@ public final class ActiveEffect {
 	 * Position fuer diesen Frame. Zwischen zwei Ticks wird interpoliert, damit
 	 * der Effekt an einem laufenden Gegner nicht ruckelt.
 	 */
-	public Vec3d renderPosition(Entity tracked, float tickDelta) {
+	public Vec3 renderPosition(Entity tracked, float tickDelta) {
 		if (settings.followEntity && tracked != null && tracked.isAlive()) {
-			return tracked.getLerpedPos(tickDelta);
+			return tracked.getPosition(tickDelta);
 		}
 
 		return position;

@@ -10,14 +10,14 @@ import com.popeffects.compat.WorldRenderHook;
 import com.popeffects.config.ConfigManager;
 import com.popeffects.config.EffectSettings;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Zeichnet die laufenden Effekte in die Welt.
@@ -50,40 +50,46 @@ public final class EffectRenderer {
 			return;
 		}
 
-		MinecraftClient client = MinecraftClient.getInstance();
-		ClientWorld world = client.world;
+		Minecraft client = Minecraft.getInstance();
+		ClientLevel world = client.level;
 
 		if (world == null) {
 			return;
 		}
 
-		MatrixStack matrices = frame.matrices();
-		VertexConsumerProvider consumers = frame.consumers();
-		Vec3d camera = frame.cameraPos();
+		PoseStack matrices = frame.poseStack();
+		SubmitNodeCollector collector = frame.collector();
+		Vec3 camera = frame.cameraPos();
 
-		float tickDelta = client.getRenderTickCounter().getTickProgress(false);
+		float tickDelta = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 		double maxDistance = ConfigManager.get().maxDistance;
 		double maxDistanceSquared = maxDistance * maxDistance;
 
 		for (ActiveEffect effect : effects) {
-			Entity tracked = world.getEntityById(effect.entityId());
-			Vec3d position = effect.renderPosition(tracked, tickDelta);
+			Entity tracked = world.getEntity(effect.entityId());
+			Vec3 position = effect.renderPosition(tracked, tickDelta);
 
-			if (position.squaredDistanceTo(camera) > maxDistanceSquared) {
+			if (position.distanceToSqr(camera) > maxDistanceSquared) {
 				continue;
 			}
 
-			matrices.push();
+			EffectSettings settings = effect.settings;
+
+			matrices.pushPose();
 			matrices.translate(position.x - camera.x, position.y - camera.y, position.z - camera.z);
-			draw(effect, matrices.peek().getPositionMatrix(), consumers, tickDelta);
-			matrices.pop();
+
+			// In 26.x schreibt man nicht mehr selbst in einen Puffer, sondern
+			// reicht die Geometrie als Zeichenbefehl ein. Den passenden
+			// Vertex-Puffer bekommt man dann im Rueckruf.
+			collector.submitCustomGeometry(matrices, EffectLayers.forEffect(settings.additive, settings.throughWalls),
+					(pose, consumer) -> draw(effect, pose.pose(), consumer, tickDelta));
+
+			matrices.popPose();
 		}
 	}
 
-	private static void draw(ActiveEffect effect, Matrix4f matrix, VertexConsumerProvider consumers, float tickDelta) {
+	private static void draw(ActiveEffect effect, Matrix4f matrix, VertexConsumer consumer, float tickDelta) {
 		EffectSettings settings = effect.settings;
-		VertexConsumer consumer = consumers.getBuffer(EffectLayers.forEffect(settings.additive,
-				settings.throughWalls));
 
 		float ageTicks = effect.age() + tickDelta;
 		float progress = effect.progress(tickDelta);
@@ -163,9 +169,9 @@ public final class EffectRenderer {
 
 				for (int ring = 0; ring < settings.ringCount; ring++) {
 					float t = (ring + 0.5F) / settings.ringCount;
-					float angle = t * MathHelper.HALF_PI;
-					float ringRadius = radius * MathHelper.cos(angle);
-					float ringY = y + height * MathHelper.sin(angle);
+					float angle = t * Mth.HALF_PI;
+					float ringRadius = radius * Mth.cos(angle);
+					float ringY = y + height * Mth.sin(angle);
 
 					ShapeRenderer.band(consumer, matrix, ringY - half, ringY + half, ringRadius, settings.segments,
 							rotation, color, color);
@@ -175,9 +181,9 @@ public final class EffectRenderer {
 			case SPHERE -> {
 				for (int ring = 0; ring < settings.ringCount; ring++) {
 					float t = (ring + 0.5F) / settings.ringCount;
-					float angle = (t - 0.5F) * MathHelper.PI;
-					float ringRadius = radius * MathHelper.cos(angle);
-					float ringY = y + height * 0.5F + height * 0.5F * MathHelper.sin(angle);
+					float angle = (t - 0.5F) * Mth.PI;
+					float ringRadius = radius * Mth.cos(angle);
+					float ringY = y + height * 0.5F + height * 0.5F * Mth.sin(angle);
 
 					ShapeRenderer.band(consumer, matrix, ringY - half, ringY + half, ringRadius, settings.segments,
 							rotation, color, color);
@@ -194,13 +200,13 @@ public final class EffectRenderer {
 					settings.segments, rotation, color, ColorMath.scaleAlpha(baseColor, 0.15F * alphaScale));
 
 			case BURST -> {
-				int rayCount = MathHelper.clamp(settings.segments / 4, 4, 24);
+				int rayCount = Mth.clamp(settings.segments / 4, 4, 24);
 				ShapeRenderer.rays(consumer, matrix, y, radius * 0.15F, radius, rayCount, thickness * 2.0F, rotation,
 						color, transparent);
 			}
 
 			case CROWN -> {
-				int spikes = MathHelper.clamp(settings.segments / 6, 5, 16);
+				int spikes = Mth.clamp(settings.segments / 6, 5, 16);
 				ShapeRenderer.crown(consumer, matrix, y, radius, height, spikes, thickness * 3.0F, rotation, color,
 						transparent);
 				softRing(consumer, matrix, y, radius, half, settings.segments, rotation, color, transparent);
@@ -224,7 +230,7 @@ public final class EffectRenderer {
 	 * waehrend des Ausblendens.
 	 */
 	private static float radiusAt(EffectSettings settings, float progress, float dissolve) {
-		float base = MathHelper.lerp(ease(progress), settings.startRadius, settings.endRadius);
+		float base = Mth.lerp(ease(progress), settings.startRadius, settings.endRadius);
 		return base + settings.fadeOutExpansion * dissolve;
 	}
 
@@ -237,7 +243,7 @@ public final class EffectRenderer {
 	 * beim Verblassen noch nach aussen zieht, loest sich auf.
 	 */
 	private static float ease(float progress) {
-		return (float) Math.pow(MathHelper.clamp(progress, 0.0F, 1.0F), 0.6D);
+		return (float) Math.pow(Mth.clamp(progress, 0.0F, 1.0F), 0.6D);
 	}
 
 	/**
@@ -255,7 +261,7 @@ public final class EffectRenderer {
 			return 0.0F;
 		}
 
-		return smooth(MathHelper.clamp(1.0F - remaining / settings.fadeOutTicks, 0.0F, 1.0F));
+		return smooth(Mth.clamp(1.0F - remaining / settings.fadeOutTicks, 0.0F, 1.0F));
 	}
 
 	/**
@@ -284,7 +290,7 @@ public final class EffectRenderer {
 			factor = Math.min(factor, remaining / settings.fadeOutTicks);
 		}
 
-		return MathHelper.clamp(factor, 0.0F, 1.0F);
+		return Mth.clamp(factor, 0.0F, 1.0F);
 	}
 
 	/** Weiches Ein- und Auslaufen - linear wirkt an den Enden abgehackt. */

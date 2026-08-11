@@ -2,7 +2,7 @@ package com.popeffects.effect;
 
 import org.joml.Matrix4f;
 
-import net.minecraft.client.render.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 /**
  * Die Geometrie der Effekte. Alles besteht aus Vierecken um den Nullpunkt
@@ -38,10 +38,10 @@ public final class ShapeRenderer {
 			float cos1 = cos(a1);
 			float sin1 = sin(a1);
 
-			consumer.vertex(matrix, cos0 * inner, y, sin0 * inner).color(innerColor);
-			consumer.vertex(matrix, cos0 * outer, y, sin0 * outer).color(outerColor);
-			consumer.vertex(matrix, cos1 * outer, y, sin1 * outer).color(outerColor);
-			consumer.vertex(matrix, cos1 * inner, y, sin1 * inner).color(innerColor);
+			consumer.addVertex(matrix, cos0 * inner, y, sin0 * inner).setColor(innerColor);
+			consumer.addVertex(matrix, cos0 * outer, y, sin0 * outer).setColor(outerColor);
+			consumer.addVertex(matrix, cos1 * outer, y, sin1 * outer).setColor(outerColor);
+			consumer.addVertex(matrix, cos1 * inner, y, sin1 * inner).setColor(innerColor);
 		}
 	}
 
@@ -66,10 +66,10 @@ public final class ShapeRenderer {
 			float x1 = cos(a1) * radius;
 			float z1 = sin(a1) * radius;
 
-			consumer.vertex(matrix, x0, bottomY, z0).color(bottomColor);
-			consumer.vertex(matrix, x0, topY, z0).color(topColor);
-			consumer.vertex(matrix, x1, topY, z1).color(topColor);
-			consumer.vertex(matrix, x1, bottomY, z1).color(bottomColor);
+			consumer.addVertex(matrix, x0, bottomY, z0).setColor(bottomColor);
+			consumer.addVertex(matrix, x0, topY, z0).setColor(topColor);
+			consumer.addVertex(matrix, x1, topY, z1).setColor(topColor);
+			consumer.addVertex(matrix, x1, bottomY, z1).setColor(bottomColor);
 		}
 	}
 
@@ -98,10 +98,10 @@ public final class ShapeRenderer {
 			int color0 = ColorMath.lerp(t0, startColor, endColor);
 			int color1 = ColorMath.lerp(t1, startColor, endColor);
 
-			consumer.vertex(matrix, x0, y0, z0).color(color0);
-			consumer.vertex(matrix, x0, y0 + thickness, z0).color(color0);
-			consumer.vertex(matrix, x1, y1 + thickness, z1).color(color1);
-			consumer.vertex(matrix, x1, y1, z1).color(color1);
+			consumer.addVertex(matrix, x0, y0, z0).setColor(color0);
+			consumer.addVertex(matrix, x0, y0 + thickness, z0).setColor(color0);
+			consumer.addVertex(matrix, x1, y1 + thickness, z1).setColor(color1);
+			consumer.addVertex(matrix, x1, y1, z1).setColor(color1);
 		}
 	}
 
@@ -125,10 +125,10 @@ public final class ShapeRenderer {
 			float outerX = dirX * outer;
 			float outerZ = dirZ * outer;
 
-			consumer.vertex(matrix, innerX + perpX, y, innerZ + perpZ).color(innerColor);
-			consumer.vertex(matrix, outerX + perpX, y, outerZ + perpZ).color(outerColor);
-			consumer.vertex(matrix, outerX - perpX, y, outerZ - perpZ).color(outerColor);
-			consumer.vertex(matrix, innerX - perpX, y, innerZ - perpZ).color(innerColor);
+			consumer.addVertex(matrix, innerX + perpX, y, innerZ + perpZ).setColor(innerColor);
+			consumer.addVertex(matrix, outerX + perpX, y, outerZ + perpZ).setColor(outerColor);
+			consumer.addVertex(matrix, outerX - perpX, y, outerZ - perpZ).setColor(outerColor);
+			consumer.addVertex(matrix, innerX - perpX, y, innerZ - perpZ).setColor(innerColor);
 		}
 	}
 
@@ -154,10 +154,10 @@ public final class ShapeRenderer {
 			float perpX = -dirZ * half;
 			float perpZ = dirX * half;
 
-			consumer.vertex(matrix, baseX + perpX, y, baseZ + perpZ).color(bottomColor);
-			consumer.vertex(matrix, baseX + perpX * 0.15F, y + height, baseZ + perpZ * 0.15F).color(topColor);
-			consumer.vertex(matrix, baseX - perpX * 0.15F, y + height, baseZ - perpZ * 0.15F).color(topColor);
-			consumer.vertex(matrix, baseX - perpX, y, baseZ - perpZ).color(bottomColor);
+			consumer.addVertex(matrix, baseX + perpX, y, baseZ + perpZ).setColor(bottomColor);
+			consumer.addVertex(matrix, baseX + perpX * 0.15F, y + height, baseZ + perpZ * 0.15F).setColor(topColor);
+			consumer.addVertex(matrix, baseX - perpX * 0.15F, y + height, baseZ - perpZ * 0.15F).setColor(topColor);
+			consumer.addVertex(matrix, baseX - perpX, y, baseZ - perpZ).setColor(bottomColor);
 		}
 	}
 

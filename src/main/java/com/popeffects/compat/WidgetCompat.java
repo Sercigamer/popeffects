@@ -2,8 +2,8 @@ package com.popeffects.compat;
 
 import java.util.function.Function;
 
-import net.minecraft.client.gui.widget.CyclingButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.network.chat.Component;
 
 /**
  * Kleine Unterschiede in der Widget-API zwischen den Minecraft-Versionen.
@@ -15,7 +15,7 @@ public final class WidgetCompat {
 	private WidgetCompat() {
 	}
 
-	public static <T> CyclingButtonWidget.Builder<T> cycler(Function<T, Text> valueToText, T initial) {
-		return CyclingButtonWidget.builder(valueToText, initial);
+	public static <T> CycleButton.Builder<T> cycler(Function<T, Component> valueToText, T initial) {
+		return CycleButton.builder(valueToText, initial);
 	}
 }

@@ -5,8 +5,8 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ClientPlayNetworkHandlerMixin",
-		"LivingEntityMixin",
-		"RenderLayerInvoker"
+		"LivingEntityMixin"
+		
 	],
 	"injectors": {
 		"defaultRequire": 1

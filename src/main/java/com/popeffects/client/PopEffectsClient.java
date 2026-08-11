@@ -32,7 +32,7 @@ public final class PopEffectsClient implements ClientModInitializer {
 		SelfTest.registerIfRequested();
 		TriggerSelfTest.registerIfRequested();
 
-		HudElementRegistry.attachElementAfter(VanillaHudElements.STATUS_EFFECTS, PopEffects.id("pop_counter"),
+		HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT, PopEffects.id("pop_counter"),
 				new PopCounterHud());
 
 		// Beim Serverwechsel sind alle Entity-IDs hinfaellig.

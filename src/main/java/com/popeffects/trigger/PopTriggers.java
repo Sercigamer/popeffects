@@ -10,9 +10,9 @@ import com.popeffects.config.PopEffectsConfig;
 import com.popeffects.config.TriggerType;
 import com.popeffects.effect.EffectManager;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Hier laufen alle Ausloeser zusammen. Die Mixins melden nur rohe Ereignisse,
@@ -48,7 +48,7 @@ public final class PopTriggers {
 		lastSelfHealth = Float.NaN;
 	}
 
-	/** Aus {@code EntityDamageS2CPacket}: wer hat wen getroffen. */
+	/** Aus {@code ClientboundDamageEventPacket}: wer hat wen getroffen. */
 	public static void onDamagePacket(int entityId, int causeId) {
 		long now = System.currentTimeMillis();
 		purge(now);
@@ -71,7 +71,7 @@ public final class PopTriggers {
 	 * Die Lebensanzeige eines Lebewesens ist gefallen. Das ist unser Schaden.
 	 */
 	public static void onHealthDrop(LivingEntity entity, float amount) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
 		// Der eigene Lebensstand kommt ueber ein eigenes Paket - sonst gaebe
 		// es den Effekt doppelt.
@@ -88,7 +88,7 @@ public final class PopTriggers {
 
 		// Ein toedlicher Treffer soll den Kill-Effekt zeigen, nicht zusaetzlich
 		// noch den Schadens-Effekt.
-		if (entity.getHealth() <= 0.0F || entity.isDead()) {
+		if (entity.getHealth() <= 0.0F || entity.isDeadOrDying()) {
 			return;
 		}
 
@@ -100,7 +100,7 @@ public final class PopTriggers {
 	}
 
 	/**
-	 * Dein eigener Lebensstand aus {@code HealthUpdateS2CPacket}.
+	 * Dein eigener Lebensstand aus {@code ClientboundSetHealthPacket}.
 	 */
 	public static void onSelfHealth(float health) {
 		float previous = lastSelfHealth;
@@ -123,14 +123,14 @@ public final class PopTriggers {
 			return;
 		}
 
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
 		if (client.player != null) {
 			EffectManager.trigger(TriggerType.SELF_HURT, client.player, amount);
 		}
 	}
 
-	private static boolean causedByLocalPlayer(int entityId, MinecraftClient client) {
+	private static boolean causedByLocalPlayer(int entityId, Minecraft client) {
 		if (client.player == null) {
 			return false;
 		}

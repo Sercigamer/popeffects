@@ -2,26 +2,24 @@ package com.popeffects.compat;
 
 import java.util.function.Consumer;
 
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Vec3d;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Haengt den Effekt-Renderer an das Welt-Rendern.
  *
- * <p>Fassung fuer Minecraft 1.21.11: die Ereignisse liegen im Unterpaket
- * {@code rendering.v1.world}, und die Kameraposition kommt aus dem
- * Render-Zustand.
+ * <p>In 26.x heisst die Welt ueberall "Level", die Ereignisse also
+ * {@code LevelRenderEvents}. Wir haengen uns an {@code COLLECT_SUBMITS} - das
+ * ist der Durchgang, in dem Zeichenbefehle eingesammelt werden.
  */
 public final class WorldRenderHook {
 	private WorldRenderHook() {
 	}
 
-	/** Ruft {@code drawer} nach den Entities auf, einmal pro Bild. */
+	/** Ruft {@code drawer} einmal pro Bild auf. */
 	public static void register(Consumer<RenderFrame> drawer) {
-		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			RenderFrame frame = toFrame(context);
 
 			if (frame != null) {
@@ -30,16 +28,13 @@ public final class WorldRenderHook {
 		});
 	}
 
-	private static RenderFrame toFrame(WorldRenderContext context) {
-		MatrixStack matrices = context.matrices();
-		VertexConsumerProvider consumers = context.consumers();
-
-		if (matrices == null || consumers == null) {
+	private static RenderFrame toFrame(LevelRenderContext context) {
+		if (context.poseStack() == null || context.submitNodeCollector() == null) {
 			return null;
 		}
 
-		Vec3d camera = context.worldState().cameraRenderState.pos;
+		Vec3 camera = context.levelState().cameraRenderState.pos;
 
-		return camera == null ? null : new RenderFrame(matrices, consumers, camera);
+		return camera == null ? null : new RenderFrame(context.poseStack(), context.submitNodeCollector(), camera);
 	}
 }

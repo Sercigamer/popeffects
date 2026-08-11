@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.popeffects.config.ConfigManager;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 /**
  * Zaehlt, wer wie oft ein Totem gepoppt hat. Reine Client-Statistik fuer die
@@ -32,7 +32,7 @@ public final class PopCounter {
 	}
 
 	public static void record(Entity entity) {
-		Entry entry = ENTRIES.computeIfAbsent(entity.getUuid(), uuid -> new Entry(entity.getName().getString()));
+		Entry entry = ENTRIES.computeIfAbsent(entity.getUUID(), uuid -> new Entry(entity.getName().getString()));
 		entry.pops++;
 		entry.lastPopMillis = System.currentTimeMillis();
 	}

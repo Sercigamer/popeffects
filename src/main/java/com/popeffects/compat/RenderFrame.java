@@ -1,20 +1,20 @@
 package com.popeffects.compat;
 
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Alles, was der Effekt-Renderer aus einem Welt-Render-Durchgang braucht.
  *
- * <p>Der Weg zu diesen drei Dingen ist je Minecraft-Version verschieden -
- * mal heisst der Ereignis-Typ anders, mal liegt er in einem anderen Paket.
- * Der Renderer selbst soll davon nichts wissen, deshalb reicht ihm
- * {@link WorldRenderHook} dieses schlichte Buendel herein.
+ * <p>In 26.x schreibt man nicht mehr selbst in einen Puffer, sondern reicht
+ * Zeichenbefehle bei einem {@link SubmitNodeCollector} ein. Der Renderer
+ * bekommt deshalb den Sammler statt eines Puffer-Anbieters.
  *
- * @param matrices  Matrizen-Stapel des Welt-Renderers, Ursprung ist die Kamera
- * @param consumers Puffer, in die gezeichnet wird
+ * @param poseStack Matrizen-Stapel des Welt-Renderers, Ursprung ist die Kamera
+ * @param collector nimmt die Zeichenbefehle entgegen
  * @param cameraPos Weltposition der Kamera
  */
-public record RenderFrame(MatrixStack matrices, VertexConsumerProvider consumers, Vec3d cameraPos) {
+public record RenderFrame(PoseStack poseStack, SubmitNodeCollector collector, Vec3 cameraPos) {
 }

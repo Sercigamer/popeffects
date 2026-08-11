@@ -5,12 +5,12 @@ import com.popeffects.config.PopEffectsConfig;
 import com.popeffects.config.TriggerType;
 import com.popeffects.effect.EffectManager;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CyclingButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * Hauptmenue der Mod. Erreichbar ueber Mod Menu, {@code /popeffects config}
@@ -23,7 +23,7 @@ public class PopEffectsConfigScreen extends Screen {
 	private final Screen parent;
 
 	public PopEffectsConfigScreen(Screen parent) {
-		super(Text.translatable("popeffects.config.title"));
+		super(Component.translatable("popeffects.config.title"));
 		this.parent = parent;
 	}
 
@@ -37,8 +37,8 @@ public class PopEffectsConfigScreen extends Screen {
 		int top = 36;
 
 		// Linke Spalte: was ueberhaupt gezeigt wird
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.enabled)
-				.build(leftX, top, COLUMN_WIDTH, 20, Text.translatable("popeffects.config.enabled"),
+		addRenderableWidget(CycleButton.onOffBuilder(config.enabled)
+				.create(leftX, top, COLUMN_WIDTH, 20, Component.translatable("popeffects.config.enabled"),
 						(button, value) -> {
 							config.enabled = value;
 
@@ -49,37 +49,37 @@ public class PopEffectsConfigScreen extends Screen {
 							ConfigManager.save();
 						}));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.showOnSelf)
-				.build(leftX, top + ROW_HEIGHT, COLUMN_WIDTH, 20, Text.translatable("popeffects.config.show_self"),
+		addRenderableWidget(CycleButton.onOffBuilder(config.showOnSelf)
+				.create(leftX, top + ROW_HEIGHT, COLUMN_WIDTH, 20, Component.translatable("popeffects.config.show_self"),
 						(button, value) -> {
 							config.showOnSelf = value;
 							ConfigManager.save();
 						}));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.showOnPlayers)
-				.build(leftX, top + ROW_HEIGHT * 2, COLUMN_WIDTH, 20,
-						Text.translatable("popeffects.config.show_players"), (button, value) -> {
+		addRenderableWidget(CycleButton.onOffBuilder(config.showOnPlayers)
+				.create(leftX, top + ROW_HEIGHT * 2, COLUMN_WIDTH, 20,
+						Component.translatable("popeffects.config.show_players"), (button, value) -> {
 							config.showOnPlayers = value;
 							ConfigManager.save();
 						}));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.showOnMobs)
-				.build(leftX, top + ROW_HEIGHT * 3, COLUMN_WIDTH, 20, Text.translatable("popeffects.config.show_mobs"),
+		addRenderableWidget(CycleButton.onOffBuilder(config.showOnMobs)
+				.create(leftX, top + ROW_HEIGHT * 3, COLUMN_WIDTH, 20, Component.translatable("popeffects.config.show_mobs"),
 						(button, value) -> {
 							config.showOnMobs = value;
 							ConfigManager.save();
 						}));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.onlyOwnHits)
-				.build(leftX, top + ROW_HEIGHT * 4, COLUMN_WIDTH, 20,
-						Text.translatable("popeffects.config.only_own_hits"), (button, value) -> {
+		addRenderableWidget(CycleButton.onOffBuilder(config.onlyOwnHits)
+				.create(leftX, top + ROW_HEIGHT * 4, COLUMN_WIDTH, 20,
+						Component.translatable("popeffects.config.only_own_hits"), (button, value) -> {
 							config.onlyOwnHits = value;
 							ConfigManager.save();
 						}));
 
-		addDrawableChild(CyclingButtonWidget.onOffBuilder(config.popCounter)
-				.build(leftX, top + ROW_HEIGHT * 5, COLUMN_WIDTH, 20,
-						Text.translatable("popeffects.config.pop_counter"), (button, value) -> {
+		addRenderableWidget(CycleButton.onOffBuilder(config.popCounter)
+				.create(leftX, top + ROW_HEIGHT * 5, COLUMN_WIDTH, 20,
+						Component.translatable("popeffects.config.pop_counter"), (button, value) -> {
 							config.popCounter = value;
 							ConfigManager.save();
 						}));
@@ -91,56 +91,56 @@ public class PopEffectsConfigScreen extends Screen {
 			int y = top + ROW_HEIGHT * row;
 			boolean active = config.get(type).enabled;
 
-			addDrawableChild(ButtonWidget
-					.builder(Text.translatable("popeffects.config.edit", Text.translatable(type.translationKey()))
-							.formatted(active ? Formatting.WHITE : Formatting.DARK_GRAY),
-							button -> this.client.setScreen(new EffectEditScreen(this, type, 0)))
-					.dimensions(rightX, y, COLUMN_WIDTH, 20).build());
+			addRenderableWidget(Button
+					.builder(Component.translatable("popeffects.config.edit", Component.translatable(type.translationKey()))
+							.withStyle(active ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY),
+							button -> this.minecraft.setScreenAndShow(new EffectEditScreen(this, type, 0)))
+					.bounds(rightX, y, COLUMN_WIDTH, 20).build());
 
 			row++;
 		}
 
-		addDrawableChild(new IntSliderWidget(rightX, top + ROW_HEIGHT * 4, COLUMN_WIDTH, 20,
+		addRenderableWidget(new IntSliderWidget(rightX, top + ROW_HEIGHT * 4, COLUMN_WIDTH, 20,
 				"popeffects.config.distance", 8, 128, (int) config.maxDistance, value -> {
 					config.maxDistance = value;
 					ConfigManager.save();
 				}));
 
-		addDrawableChild(new IntSliderWidget(rightX, top + ROW_HEIGHT * 5, COLUMN_WIDTH, 20,
+		addRenderableWidget(new IntSliderWidget(rightX, top + ROW_HEIGHT * 5, COLUMN_WIDTH, 20,
 				"popeffects.config.max_effects", 1, 128, config.maxActiveEffects, value -> {
 					config.maxActiveEffects = value;
 					ConfigManager.save();
 				}));
 
-		addDrawableChild(ButtonWidget.builder(Text.translatable("popeffects.config.reset_all"), button -> {
+		addRenderableWidget(Button.builder(Component.translatable("popeffects.config.reset_all"), button -> {
 			ConfigManager.reset();
-			this.clearAndInit();
-		}).dimensions(centerX - 155, this.height - 30, 150, 20).build());
+			this.rebuildWidgets();
+		}).bounds(centerX - 155, this.height - 30, 150, 20).build());
 
-		addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), button -> this.close())
-				.dimensions(centerX + 5, this.height - 30, 150, 20).build());
+		addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> this.onClose())
+				.bounds(centerX + 5, this.height - 30, 150, 20).build());
 	}
 
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-		super.render(context, mouseX, mouseY, deltaTicks);
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
+		super.extractRenderState(context, mouseX, mouseY, deltaTicks);
 
-		context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 0xFFFFFFFF);
+		context.centeredText(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
 
-		Text hint = Text.translatable("popeffects.config.hint").formatted(Formatting.GRAY);
-		context.drawCenteredTextWithShadow(this.textRenderer, hint, this.width / 2, this.height - 44, 0xFFAAAAAA);
+		Component hint = Component.translatable("popeffects.config.hint").withStyle(ChatFormatting.GRAY);
+		context.centeredText(this.font, hint, this.width / 2, this.height - 44, 0xFFAAAAAA);
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		// Nicht pausieren, damit man die Vorschau im Einzelspieler auch laufen
 		// sieht.
 		return false;
 	}
 
 	@Override
-	public void close() {
+	public void onClose() {
 		ConfigManager.save();
-		this.client.setScreen(this.parent);
+		this.minecraft.setScreenAndShow(this.parent);
 	}
 }

@@ -7,13 +7,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.popeffects.trigger.PopTriggers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
-import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityEvent;
+import net.minecraft.network.protocol.game.ClientboundDamageEventPacket;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 
 /**
  * Hoert mit, was der Server ueber Totems, Treffer und Tode erzaehlt.
@@ -22,38 +22,38 @@ import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
  * Code noch im Netzwerk-Thread, und von dort darf man nichts anfassen, was zum
  * Rendern gehoert.
  */
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public abstract class ClientPlayNetworkHandlerMixin {
 	@Inject(method = "onEntityStatus", at = @At("TAIL"))
-	private void popeffects$onEntityStatus(EntityStatusS2CPacket packet, CallbackInfo ci) {
-		MinecraftClient client = MinecraftClient.getInstance();
+	private void popeffects$onEntityStatus(ClientboundEntityEventPacket packet, CallbackInfo ci) {
+		Minecraft client = Minecraft.getInstance();
 
-		if (client.world == null) {
+		if (client.level == null) {
 			return;
 		}
 
-		Entity entity = packet.getEntity(client.world);
+		Entity entity = packet.getEntity(client.level);
 
 		if (entity == null) {
 			return;
 		}
 
-		byte status = packet.getStatus();
+		byte status = packet.getEventId();
 
-		if (status == EntityStatuses.USE_TOTEM_OF_UNDYING) {
+		if (status == EntityEvent.PROTECTED_FROM_DEATH) {
 			PopTriggers.onTotemPop(entity);
-		} else if (status == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {
+		} else if (status == EntityEvent.DEATH) {
 			PopTriggers.onDeath(entity);
 		}
 	}
 
 	@Inject(method = "onEntityDamage", at = @At("TAIL"))
-	private void popeffects$onEntityDamage(EntityDamageS2CPacket packet, CallbackInfo ci) {
+	private void popeffects$onEntityDamage(ClientboundDamageEventPacket packet, CallbackInfo ci) {
 		PopTriggers.onDamagePacket(packet.entityId(), packet.sourceCauseId());
 	}
 
 	@Inject(method = "onHealthUpdate", at = @At("TAIL"))
-	private void popeffects$onHealthUpdate(HealthUpdateS2CPacket packet, CallbackInfo ci) {
+	private void popeffects$onHealthUpdate(ClientboundSetHealthPacket packet, CallbackInfo ci) {
 		PopTriggers.onSelfHealth(packet.getHealth());
 	}
 }
