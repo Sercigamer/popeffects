@@ -4,6 +4,27 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [2.1.0] - 2026-08-11
+
+### Behoben
+
+- **Ringe erschienen aus dem Nichts.** Der Schadens-Effekt feuerte bei jedem
+  Absinken der Lebensanzeige — auch dann, wenn gar kein Treffer stattgefunden
+  hatte. Das passiert zum Beispiel, sobald ein verletzter Gegner in Sichtweite
+  gerät: der Client legt ihn erst mit vollen Herzen an, der echte Wert kommt
+  einen Moment später nach, und diese Differenz sah aus wie ein harter Schlag.
+  Jetzt muss zusätzlich das Schadens-Paket des Servers vorliegen — das gibt es
+  nur bei einem echten Treffer.
+
+### Geändert
+
+- **Der Effekt-Editor zeigt standardmäßig nur noch das Wichtige.** Pro Reiter
+  stehen die Einstellungen, die man wirklich oft anfasst; der Schalter **Alle
+  Regler** unten holt den Rest dazu. Es fällt nichts weg, es steht nur nicht
+  mehr alles gleichzeitig auf dem Bildschirm.
+- Die Wahl merkt sich die Mod in der Config, ausgeblendete Zeilen rutschen
+  nach oben statt Lücken zu lassen.
+
 ## [2.0.0] - 2026-08-11
 
 Portierung auf **Minecraft 26.2**. Für 1.21.10 und 1.21.11 gibt es weiterhin
@@ -178,6 +199,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[2.1.0]: https://github.com/Sercigamer/popeffects/releases/tag/v2.1.0
 [2.0.0]: https://github.com/Sercigamer/popeffects/releases/tag/v2.0.0
 [1.4.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.1

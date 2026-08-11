@@ -77,6 +77,8 @@
 	"popeffects.edit.scale_with_damage": "Size by damage",
 	"popeffects.edit.preview": "Preview",
 	"popeffects.edit.reset": "Reset",
+	"popeffects.edit.detail_simple": "Essentials only",
+	"popeffects.edit.detail_all": "All settings",
 
 	"popeffects.hud.title": "Totem pops",
 	"popeffects.hud.entry": "%s ×%s",

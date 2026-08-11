@@ -77,6 +77,8 @@
 	"popeffects.edit.scale_with_damage": "Größe je Schaden",
 	"popeffects.edit.preview": "Vorschau",
 	"popeffects.edit.reset": "Zurücksetzen",
+	"popeffects.edit.detail_simple": "Nur Wichtiges",
+	"popeffects.edit.detail_all": "Alle Regler",
 
 	"popeffects.hud.title": "Totem-Pops",
 	"popeffects.hud.entry": "%s ×%s",

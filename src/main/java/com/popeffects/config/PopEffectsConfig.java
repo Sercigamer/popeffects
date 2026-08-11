@@ -41,6 +41,9 @@ public final class PopEffectsConfig {
 	public int maxActiveEffects = 32;
 
 	/** Kleine Liste im HUD, wer wie oft gepoppt hat. */
+	/** Zeigt im Effekt-Editor alle Einstellungen statt nur der wichtigsten. */
+	public boolean showAllSettings = false;
+
 	public boolean popCounter = true;
 
 	/** So lange bleibt ein Eintrag in der Liste stehen (Sekunden). */

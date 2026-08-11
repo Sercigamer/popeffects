@@ -92,6 +92,16 @@ public final class PopTriggers {
 			return;
 		}
 
+		// Zu einem echten Treffer gehoert immer ein Schadens-Paket. Fehlt es,
+		// ist die Aenderung der Lebensanzeige etwas anderes: zum Beispiel ein
+		// verletzter Gegner, der gerade in Sichtweite geraet - den legt der
+		// Client erst mit vollen Herzen an, der echte Wert kommt einen Moment
+		// spaeter nach. Ohne diese Pruefung sah das aus wie ein Treffer, und
+		// es erschienen Ringe aus dem Nichts.
+		if (!recentlyDamaged(entity.getId())) {
+			return;
+		}
+
 		if (config.onlyOwnHits && !causedByLocalPlayer(entity.getId(), client)) {
 			return;
 		}
@@ -128,6 +138,14 @@ public final class PopTriggers {
 		if (client.player != null) {
 			EffectManager.trigger(TriggerType.SELF_HURT, client.player, amount);
 		}
+	}
+
+	/** Kam fuer dieses Ziel gerade eben ein Schadens-Paket herein? */
+	private static boolean recentlyDamaged(int entityId) {
+		Attribution attribution = ATTRIBUTIONS.get(entityId);
+
+		return attribution != null
+				&& System.currentTimeMillis() - attribution.time() <= ATTRIBUTION_WINDOW_MILLIS;
 	}
 
 	private static boolean causedByLocalPlayer(int entityId, Minecraft client) {
