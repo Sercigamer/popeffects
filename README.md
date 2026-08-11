@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/Sercigamer/popeffects/actions/workflows/build.yml/badge.svg)](https://github.com/Sercigamer/popeffects/actions/workflows/build.yml)
 
-Clientseitige Fabric-Mod für **Minecraft 1.21.10 und 1.21.11**. Poppt jemand ein Totem,
+Clientseitige Fabric-Mod für **Minecraft 26.2**. Poppt jemand ein Totem,
 frisst einen harten Treffer oder geht zu Boden, legt PopEffects einen
 leuchtenden Effekt um ihn herum — und zwar genau den, den du dir eingestellt
 hast.
@@ -12,9 +12,9 @@ einzelne Auslöser hat seinen eigenen Stil, seine eigenen Farben, seine eigene
 Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 
 - Läuft **nur bei dir**. Der Server merkt nichts davon, Mitspieler sehen nichts.
-- Ein Jar je Minecraft-Version. Auf 1.21.10 fehlen **Leuchten** und **Durch
-  Wände** — beide sind ohnehin standardmäßig aus, im Menü sind die Schalter
-  dort ausgegraut. Sonst ist alles gleich.
+- Auf 26.x fehlen **Leuchten** und **Durch Wände** — beide sind ohnehin
+  standardmäßig aus, im Menü sind die Schalter ausgegraut. Sonst ist alles
+  gleich.
 - Keine neuen Shader-Dateien, keine Texturen — die Effekte werden zur Laufzeit
   aus Geometrie gebaut.
 - Getestet mit Fabric und **Lunar Client**.
@@ -42,13 +42,11 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 
 ### Normales Fabric
 
-1. [Fabric Loader](https://fabricmc.net/use/installer/) für deine Version (**1.21.10** oder **1.21.11**) installieren.
-2. [Fabric API](https://modrinth.com/mod/fabric-api) für 1.21.11 in den
+1. [Fabric Loader](https://fabricmc.net/use/installer/) für **26.2** installieren. Es braucht **Java 25**.
+2. [Fabric API](https://modrinth.com/mod/fabric-api) für 26.2 in den
    `mods`-Ordner legen. **Ohne sie startet die Mod nicht.**
 3. Das passende Jar daneben legen — die Minecraft-Version steht im Dateinamen:
-   `popeffects-1.4.0+1.21.11.jar` oder `popeffects-1.4.0+1.21.10.jar`.
-4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) — dann gibt es im
-   Mod-Menü einen Zahnrad-Knopf zu PopEffects.
+   `popeffects-2.0.0+26.2.jar`.
 
 Den `mods`-Ordner findest du über den Startbildschirm des Minecraft-Launchers
 oder unter `%APPDATA%\.minecraft\mods`.
@@ -59,7 +57,7 @@ Lunar Client kann Fabric-Mods laden, braucht dafür aber die **Fabric**-Variante
 der Mod — die hier also, keine Forge-Version.
 
 1. Lunar-Client-Launcher öffnen.
-2. Links die Version **1.21.11** auswählen.
+2. Links die Version **26.2** auswählen.
 3. Unten rechts auf *Einstellungen*, oben den Reiter **Mods** wählen.
 4. Das passende Jar **und** `fabric-api-....jar` in das Fenster ziehen.
    Über den 📁-Knopf kommst du direkt in den Ordner, falls du lieber kopierst.
@@ -159,12 +157,16 @@ Das Menü hat pro Effekt vier Reiter, jeder mit einem klaren Thema.
 | Schein | Breiter, blasser Halo hinter der Form. Macht die Form sichtbar dicker, deshalb **standardmäßig aus** |
 | Durch Wände | Der Effekt bleibt auch hinter Blöcken sichtbar |
 
-**Leuchten** und **Schein** sind bewusst aus: beide arbeiten gegen ein sauberes
-Ausblenden. Additiv addiert Licht auf den Hintergrund, statt ihn zu überdecken —
-eine helle Farbe blüht dann auf und wirkt breiter, als sie ist. Der Schein legt
-zusätzlich eine mehrfach breitere Kopie darunter. Ohne beides bleibt der Ring
-eine dünne Linie, die über die eingestellte Zeit einfach durchsichtig wird. Wer
-den Neonlook will, schaltet sie einzeln dazu.
+**Leuchten** und **Durch Wände** stehen auf 26.x **nicht zur Verfügung**: die
+Bausteine, aus denen sich eigene Render-Pipelines bauen lassen, sind dort nicht
+erreichbar. Die Mod nutzt stattdessen den Vanilla-Typ `debugQuads`, und die
+beiden Schalter sind im Menü ausgegraut statt wirkungslos. Beide sind ohnehin
+standardmäßig aus, der Rest ist identisch.
+
+Das ist kein großer Verlust: additives Mischen arbeitet gegen ein sauberes
+Ausblenden, weil die Deckkraft dann die Helligkeit statt der Durchsichtigkeit
+steuert. Ohne es bleibt der Ring eine dünne Linie, die über die eingestellte
+Zeit einfach durchsichtig wird — genau so, wie er soll.
 
 ### Reiter „Ablauf"
 

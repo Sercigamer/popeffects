@@ -24,7 +24,7 @@ import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
  */
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPlayNetworkHandlerMixin {
-	@Inject(method = "onEntityStatus", at = @At("TAIL"))
+	@Inject(method = "handleEntityEvent", at = @At("TAIL"))
 	private void popeffects$onEntityStatus(ClientboundEntityEventPacket packet, CallbackInfo ci) {
 		Minecraft client = Minecraft.getInstance();
 
@@ -47,12 +47,12 @@ public abstract class ClientPlayNetworkHandlerMixin {
 		}
 	}
 
-	@Inject(method = "onEntityDamage", at = @At("TAIL"))
+	@Inject(method = "handleDamageEvent", at = @At("TAIL"))
 	private void popeffects$onEntityDamage(ClientboundDamageEventPacket packet, CallbackInfo ci) {
 		PopTriggers.onDamagePacket(packet.entityId(), packet.sourceCauseId());
 	}
 
-	@Inject(method = "onHealthUpdate", at = @At("TAIL"))
+	@Inject(method = "handleSetHealth", at = @At("TAIL"))
 	private void popeffects$onHealthUpdate(ClientboundSetHealthPacket packet, CallbackInfo ci) {
 		PopTriggers.onSelfHealth(packet.getHealth());
 	}

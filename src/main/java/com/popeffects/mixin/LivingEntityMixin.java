@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin {
 	@Unique
 	private float popeffects$knownHealth = Float.NaN;
 
-	@Inject(method = "onTrackedDataSet", at = @At("TAIL"))
+	@Inject(method = "onSyncedDataUpdated", at = @At("TAIL"))
 	private void popeffects$watchHealth(EntityDataAccessor<?> data, CallbackInfo ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
 

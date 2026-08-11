@@ -4,6 +4,39 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [2.0.0] - 2026-08-11
+
+Portierung auf **Minecraft 26.2**. Für 1.21.10 und 1.21.11 gibt es weiterhin
+die 1.4.x-Reihe aus dem Zweig `main`.
+
+### Geändert
+
+- **Minecraft 26.x wird unobfuskiert ausgeliefert.** Mojang veröffentlicht
+  deshalb keine Mappings mehr und Fabric kein Yarn; der Build braucht weder
+  einen `mappings`-Eintrag noch `modImplementation`. Dafür ist **Java 25**
+  Pflicht.
+- Jeder Minecraft-Typ heißt anders. Die Namen sind eine Mischung:
+  `MinecraftClient` wird zu `Minecraft`, `Text` zu `Component` — der ID-Typ
+  heißt aber `Identifier`, also ausgerechnet wie in Yarn.
+- **Der Weltrenderer war ein Umbau, keine Übersetzung.** Statt selbst in einen
+  Puffer zu schreiben, reicht die Mod ihre Geometrie über
+  `submitCustomGeometry` bei einem `SubmitNodeCollector` ein. Die Formen selbst
+  konnten unverändert bleiben.
+- Oberflächen arbeiten jetzt wie der Weltrenderer mit einer Extraktions-Phase:
+  aus `DrawContext` wurde `GuiGraphicsExtractor`, aus `render` wird
+  `extractRenderState`.
+
+### Nicht dabei auf 26.x
+
+- **Leuchten** und **Durch Wände**: die Bausteine für eigene Render-Pipelines
+  sind nicht erreichbar. Die Mod nutzt den Vanilla-Typ `debugQuads`; die beiden
+  Schalter sind im Menü ausgegraut statt wirkungslos. Beide sind ohnehin
+  standardmäßig aus, der Rest ist identisch.
+- Der Selbsttest legt Screenshots nur noch unter dem automatischen
+  Zeitstempel-Namen ab — an das Render-Ziel kommt man nicht mehr ohne Weiteres
+  heran. Der gewünschte Name steht im Log, die Reihenfolge stimmt.
+- Mod Menu ist vorerst nicht eingebunden.
+
 ## [1.4.0] - 2026-08-11
 
 ### Neu
@@ -145,6 +178,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[2.0.0]: https://github.com/Sercigamer/popeffects/releases/tag/v2.0.0
 [1.4.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.0
