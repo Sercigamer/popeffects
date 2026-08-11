@@ -46,7 +46,7 @@ Größe, seinen eigenen Sound. Alles im Spiel einstellbar, mit Vorschau.
 2. [Fabric API](https://modrinth.com/mod/fabric-api) für 1.21.11 in den
    `mods`-Ordner legen. **Ohne sie startet die Mod nicht.**
 3. Das passende Jar daneben legen — die Minecraft-Version steht im Dateinamen:
-   `popeffects-1.4.0+1.21.11.jar` oder `popeffects-1.4.0+1.21.10.jar`.
+   `popeffects-1.4.1+1.21.11.jar` oder `popeffects-1.4.1+1.21.10.jar`.
 4. Optional: [Mod Menu](https://modrinth.com/mod/modmenu) — dann gibt es im
    Mod-Menü einen Zahnrad-Knopf zu PopEffects.
 

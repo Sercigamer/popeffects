@@ -88,7 +88,10 @@ public final class TriggerSelfTest {
 		switch (step) {
 			case ENSURE_SURVIVAL -> {
 				run(client, "gamemode survival @s");
-				next(Step.ARM_TOTEM, SETTLE_TICKS);
+				// Grosszuegig warten: der Spielmodus muss wirklich durch sein,
+				// sonst prallt der Schaden ab und der Test faellt aus dem
+				// falschen Grund durch.
+				next(Step.ARM_TOTEM, SETTLE_TICKS * 4);
 			}
 			case ARM_TOTEM -> {
 				// Vorher aufraeumen, damit ein Effekt von vorhin nicht als

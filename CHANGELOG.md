@@ -4,6 +4,21 @@ Alle nennenswerten Änderungen an PopEffects. Das Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.4.1] - 2026-08-11
+
+### Behoben
+
+- **Ringe erschienen aus dem Nichts.** Der Schadens-Effekt feuerte bei jedem
+  Absinken der Lebensanzeige — auch dann, wenn gar kein Treffer stattgefunden
+  hatte. Das passiert zum Beispiel, sobald ein verletzter Gegner in Sichtweite
+  gerät: der Client legt ihn erst mit vollen Herzen an, der echte Wert kommt
+  einen Moment später nach, und diese Differenz sah aus wie ein harter Schlag.
+  Jetzt muss zusätzlich das Schadens-Paket des Servers vorliegen — das gibt es
+  nur bei einem echten Treffer. Betrifft alle Versionen seit 1.3.1.
+- Der Auslöser-Selbsttest wartet nach dem Wechsel in den Überlebensmodus
+  länger, bevor er Schaden austeilt. Vorher schlug er gelegentlich fehl, weil
+  der Spieler noch unverwundbar war — ein Fehler im Test, nicht in der Mod.
+
 ## [1.4.0] - 2026-08-11
 
 ### Neu
@@ -145,6 +160,7 @@ Erste Veröffentlichung.
 - Tastenbelegung: `P` öffnet das Menü, zwei weitere Tasten sind frei belegbar.
 - Deutsche und englische Sprachdatei, Mod-Menu-Integration.
 
+[1.4.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sercigamer/popeffects/releases/tag/v1.3.0
