@@ -8,7 +8,7 @@
 		"${github_user}"
 	],
 	"contact": {
-		"homepage": "https://github.com/${github_user}/${github_repo}",
+		"homepage": "https://modrinth.com/mod/${modrinth_slug}",
 		"sources": "https://github.com/${github_user}/${github_repo}",
 		"issues": "https://github.com/${github_user}/${github_repo}/issues"
 	},
