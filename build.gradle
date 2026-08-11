@@ -88,11 +88,13 @@ processResources {
 	inputs.property 'version', project.version
 	inputs.property 'github_user', project.github_user
 	inputs.property 'github_repo', project.github_repo
+	inputs.property 'modrinth_slug', project.modrinth_slug
 
 	filesMatching('fabric.mod.json') {
 		expand 'version': inputs.properties.version,
 				'github_user': inputs.properties.github_user,
-				'github_repo': inputs.properties.github_repo
+				'github_repo': inputs.properties.github_repo,
+				'modrinth_slug': inputs.properties.modrinth_slug
 	}
 }
 

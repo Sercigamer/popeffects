@@ -137,3 +137,53 @@ jobs:
           body_path: release-body.md
           files: release/*.jar
           fail_on_unmatched_files: true
+
+      # Der Upload zu Modrinth laeuft nur, wenn das Geheimnis MODRINTH_TOKEN
+      # hinterlegt ist. Ohne Token wird der Schritt uebersprungen statt den
+      # ganzen Release scheitern zu lassen - wer das Repo forkt, soll nicht
+      # ueber eine fehlende Zugangsberechtigung stolpern.
+      - name: Modrinth-Token vorhanden?
+        id: modrinth
+        run: |
+          if [ -n "${{ secrets.MODRINTH_TOKEN }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::MODRINTH_TOKEN ist nicht gesetzt - Upload zu Modrinth wird uebersprungen."
+          fi
+
+      # Je Minecraft-Version ein eigener Upload: Modrinth fuehrt sie als
+      # getrennte Versionen, und die Jars sind auch verschieden.
+      - name: Nach Modrinth hochladen (1.21.11)
+        if: steps.modrinth.outputs.ready == 'true'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: release/*+1.21.11.jar
+          name: PopEffects ${{ env.MOD_VERSION }} (1.21.11)
+          version: ${{ env.MOD_VERSION }}+1.21.11
+          version-type: release
+          changelog-file: release-body.md
+          loaders: fabric
+          game-versions: "1.21.11"
+          java: 21
+          dependencies: |
+            fabric-api(required)
+
+      - name: Nach Modrinth hochladen (1.21.10)
+        if: steps.modrinth.outputs.ready == 'true'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: release/*+1.21.10.jar
+          name: PopEffects ${{ env.MOD_VERSION }} (1.21.10)
+          version: ${{ env.MOD_VERSION }}+1.21.10
+          version-type: release
+          changelog-file: release-body.md
+          loaders: fabric
+          game-versions: "1.21.10"
+          java: 21
+          dependencies: |
+            fabric-api(required)
